@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: aelithrastay-backend
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn aelithrastay.wsgi:application"
+    envVars:
+      - key: DEBUG
+        value: False
