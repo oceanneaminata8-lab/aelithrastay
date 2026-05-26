@@ -1,4 +1,4 @@
-# AelithraStay
+# AelithraStay BY Oceanne Aminata
 
 AelithraStay is a full-stack Airbnb-style web application built with:
 
