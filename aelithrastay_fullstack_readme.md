@@ -307,7 +307,7 @@ You can deploy Angular on:
 - Netlify
 - Firebase Hosting
 
-## Backend Deployment
+## Backend Deployment but Render Advi
 
 You can deploy Django on:
 
