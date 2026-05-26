@@ -299,7 +299,7 @@ git push
 
 # Deployment 
 
-## Frontend Deployment
+## Frontend Deployment but Vercel advisable
 
 You can deploy Angular on:
 
