@@ -115,16 +115,19 @@ import { AuthService } from '../../core/auth.service';
 
             <article class="description">
               <h3>About this place</h3>
-              <p>{{ stay.description }}</p>
-              <button class="show-more">Show more <span class="material-symbols-outlined">chevron_right</span></button>
+              <p [class.expanded]="showFullDescription()">{{ stay.description }}</p>
+              <button class="show-more" (click)="showFullDescription.set(!showFullDescription())">
+                {{ showFullDescription() ? 'Show less' : 'Show more' }} 
+                <span class="material-symbols-outlined">{{ showFullDescription() ? 'expand_less' : 'chevron_right' }}</span>
+              </button>
             </article>
 
             <hr class="divider" />
 
             <section class="amenities">
               <h3>What this place offers</h3>
-              <div class="amenity-grid">
-                @for (amenity of stay.amenities; track amenity.id) {
+              <div class="amenity-grid" [class.all]="showAllAmenities()">
+                @for (amenity of (showAllAmenities() ? stay.amenities : stay.amenities.slice(0, 6)); track amenity.id) {
                   <div class="amenity-item">
                     <span class="material-symbols-outlined">{{ amenity.icon || 'check_circle' }}</span>
                     <span>{{ amenity.name }}</span>
@@ -133,7 +136,11 @@ import { AuthService } from '../../core/auth.service';
                   <p class="muted">Essential amenities provided by the host.</p>
                 }
               </div>
-              <button class="btn-outline">Show all amenities</button>
+              @if (stay.amenities.length > 6) {
+                <button class="btn-outline" (click)="showAllAmenities.set(!showAllAmenities())">
+                  {{ showAllAmenities() ? 'Hide amenities' : 'Show all ' + stay.amenities.length + ' amenities' }}
+                </button>
+              }
             </section>
 
             <hr class="divider" />
@@ -156,7 +163,10 @@ import { AuthService } from '../../core/auth.service';
                   }
                 </div>
                 <textarea formControlName="comment" placeholder="How was your stay?"></textarea>
-                <button type="submit" class="btn-primary" [disabled]="reviewForm.invalid">Post Review</button>
+                <button type="submit" class="btn-post-review" [disabled]="reviewForm.invalid">
+                  Post Review
+                  <span class="material-symbols-outlined">send</span>
+                </button>
               </form>
 
               <div class="review-list">
@@ -347,13 +357,58 @@ import { AuthService } from '../../core/auth.service';
     .highlight-item p { color: var(--text-muted); margin: 0; font-size: 0.95rem; line-height: 1.5; }
 
     .description h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 16px; }
-    .description p { line-height: 1.7; color: var(--text-main); margin-bottom: 16px; }
+    .description p { line-height: 1.7; color: var(--text-main); margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .description p.expanded { -webkit-line-clamp: unset; display: block; overflow: visible; }
     .show-more { background: transparent; border: 0; color: var(--text-main); font-weight: 800; text-decoration: underline; display: flex; align-items: center; cursor: pointer; }
+
+    .rating-input { display: flex; gap: 4px; margin-bottom: 16px; }
+    .rating-input button { background: transparent; border: 0; padding: 0; cursor: pointer; transition: transform 0.2s; }
+    .rating-input button:hover { transform: scale(1.2); }
+    .rating-input .material-symbols-outlined { color: #ccc; font-size: 32px; transition: color 0.2s; }
+    .rating-input .material-symbols-outlined.filled { color: #ffb800; font-variation-settings: 'FILL' 1; }
 
     .amenities h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 24px; }
     .amenity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
     .amenity-item { display: flex; align-items: center; gap: 16px; font-size: 1.05rem; }
     .amenity-item .material-symbols-outlined { font-size: 24px; color: var(--text-muted); }
+
+    .btn-post-review {
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 32px;
+      background: #1b1c1c;
+      color: #fff !important;
+      border: 0;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-post-review:hover:not(:disabled) {
+      background: var(--primary);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 24px rgba(186, 0, 54, 0.2);
+    }
+
+    .btn-post-review:disabled {
+      background: #e6e2dc;
+      color: #888 !important;
+      cursor: not-allowed;
+      opacity: 0.8;
+    }
+
+    .btn-post-review .material-symbols-outlined {
+      font-size: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    .btn-post-review:hover .material-symbols-outlined {
+      transform: translateX(4px) rotate(-15deg);
+    }
 
     .btn-outline { background: var(--white); border: 1px solid var(--text-main); padding: 12px 24px; border-radius: 10px; font-weight: 800; cursor: pointer; transition: background 0.2s; }
     .btn-outline:hover { background: var(--bg-light); }
@@ -415,6 +470,8 @@ export class PropertyDetailPage {
   protected readonly property = signal<Property | null>(null);
   protected readonly reviews = signal<Review[]>([]);
   protected readonly message = signal('');
+  protected readonly showFullDescription = signal(false);
+  protected readonly showAllAmenities = signal(false);
   protected readonly Number = Number;
 
   private readonly fallbackImages = [
@@ -492,6 +549,12 @@ export class PropertyDetailPage {
   }
 
   review(property: number): void {
+    if (!this.auth.isLoggedIn()) {
+      this.flash('Please login to post a review.');
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
+
     if (this.reviewForm.invalid) return;
     this.reviewsApi.create({ property, ...this.reviewForm.getRawValue() }).subscribe({
       next: () => {
@@ -499,7 +562,13 @@ export class PropertyDetailPage {
         this.loadReviews(property);
         this.flash('Thank you for your review!');
       },
-      error: () => this.flash('Could not post review. Login may be required.')
+      error: (err) => {
+        if (err.status === 400 && err.error?.non_field_errors?.[0]?.includes('unique')) {
+          this.flash('You have already reviewed this property.');
+        } else {
+          this.flash('Could not post review. Ensure all fields are filled and you have not reviewed this yet.');
+        }
+      }
     });
   }
 

@@ -20,3 +20,6 @@ class ReviewSerializer(serializers.ModelSerializer):
             'created_at',
         )
         read_only_fields = ('id', 'guest', 'created_at')
+        extra_kwargs = {
+            'booking': {'required': False, 'allow_null': True}
+        }
