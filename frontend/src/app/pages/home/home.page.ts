@@ -163,7 +163,7 @@ interface InspirationStay {
             <div class="testimonial-card">
               <span class="quote">"</span>
               <p>Hosting changed our lives. We've met amazing people from every corner of the world."</p>
-              <strong>Sarah and Mark, Superhosts</strong>
+              <strong>Oceanne and Maimuna , Superhosts</strong>
             </div>
           </div>
         </div>
