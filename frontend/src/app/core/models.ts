@@ -15,6 +15,7 @@ export interface User {
   phone?: string;
   avatar?: string;
   bio?: string;
+  is_suspended: boolean;
 }
 
 export interface Amenity {
@@ -52,6 +53,9 @@ export interface Property {
   average_rating: number | null;
   review_count: number;
   is_active: boolean;
+  approval_status: 'pending' | 'approved' | 'rejected';
+  is_reported: boolean;
+  moderation_note: string;
 }
 
 export interface Booking {
@@ -64,6 +68,9 @@ export interface Booking {
   guests: number;
   nights: number;
   status: string;
+  dispute_status: 'none' | 'open' | 'reviewing' | 'resolved';
+  dispute_reason: string;
+  dispute_resolution: string;
   total_price: string;
   created_at?: string;
   updated_at?: string;
@@ -76,6 +83,18 @@ export interface Review {
   property_title: string;
   rating: number;
   comment: string;
+  moderation_status: 'clean' | 'reported' | 'hidden' | 'resolved';
+  moderation_note: string;
+  created_at: string;
+}
+
+export interface Notification {
+  id: number;
+  user: number;
+  user_name: string;
+  title: string;
+  message: string;
+  is_read: boolean;
   created_at: string;
 }
 

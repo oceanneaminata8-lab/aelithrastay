@@ -583,42 +583,195 @@ button.stay-card {
   min-height: calc(100vh - 65px);
   place-items: center;
   overflow: hidden;
-  background: #f6f3f2;
   padding: 48px 24px;
+  background: radial-gradient(circle at 15% 10%, rgba(255, 225, 235, 0.55), transparent 24%),
+              radial-gradient(circle at 85% 15%, rgba(163, 212, 255, 0.32), transparent 22%),
+              linear-gradient(180deg, #ffffff 0%, #f4f5f6 100%);
 }
 
 .auth-shell::before,
 .auth-shell::after {
   position: absolute;
-  width: 38vw;
-  height: 38vw;
+  width: 30vw;
+  height: 30vw;
   border-radius: 999px;
   content: "";
-  filter: blur(110px);
-  opacity: 0.24;
+  filter: blur(100px);
+  opacity: 0.26;
 }
 
 .auth-shell::before {
-  top: -18vw;
-  left: -14vw;
-  background: #ffb2b6;
+  top: -16vw;
+  left: -10vw;
+  background: rgba(255, 181, 202, 0.48);
 }
 
 .auth-shell::after {
   right: -14vw;
-  bottom: -18vw;
-  background: #91f2f7;
+  bottom: -12vw;
+  background: rgba(100, 177, 255, 0.28);
+}
+
+.destination-wall {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.destination-card {
+  position: absolute;
+  display: grid;
+  align-items: end;
+  border-radius: 28px;
+  overflow: hidden;
+  padding: 18px;
+  color: #fff;
+  box-shadow: 0 34px 90px rgba(17, 24, 39, 0.18);
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.destination-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 42px 120px rgba(17, 24, 39, 0.2);
+}
+
+.destination-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(15, 23, 42, 0.72));
+}
+
+.destination-card .destination-icon {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  color: #1b1c1c;
+  font-size: 22px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+}
+
+.destination-card > div {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 6px;
+}
+
+.destination-card span {
+  display: inline-flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.destination-card small {
+  font-size: 0.76rem;
+  opacity: 0.84;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.card-paris {
+  top: 8%;
+  left: 6%;
+  width: 220px;
+  height: 270px;
+  transform: rotate(-4deg);
+  background-image:
+    radial-gradient(circle at 16% 18%, rgba(255, 255, 255, 0.18), transparent 30%),
+    linear-gradient(180deg, #f7d6da 0%, #ff9fb5 100%);
+}
+
+.card-miami {
+  top: 5%;
+  right: 8%;
+  width: 200px;
+  height: 250px;
+  transform: rotate(5deg);
+  background-image:
+    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.24), transparent 28%),
+    linear-gradient(180deg, #e8f0ff 0%, #7ca6ff 100%);
+}
+
+.card-tokyo {
+  top: 38%;
+  left: 4%;
+  width: 200px;
+  height: 260px;
+  transform: rotate(2deg);
+  background-image:
+    radial-gradient(circle at 88% 20%, rgba(255, 255, 255, 0.22), transparent 28%),
+    linear-gradient(180deg, #d8e3ff 0%, #4d6ccf 100%);
+}
+
+.card-rio {
+  top: 36%;
+  right: 12%;
+  width: 230px;
+  height: 240px;
+  transform: rotate(-3deg);
+  background-image:
+    radial-gradient(circle at 82% 82%, rgba(255, 255, 255, 0.18), transparent 24%),
+    linear-gradient(180deg, #ffe8c9 0%, #ff9265 100%);
+}
+
+.card-marrakech {
+  bottom: 12%;
+  left: 10%;
+  width: 215px;
+  height: 250px;
+  transform: rotate(4deg);
+  background-image:
+    radial-gradient(circle at 24% 82%, rgba(255, 255, 255, 0.17), transparent 26%),
+    linear-gradient(180deg, #f7d9af 0%, #d97a64 100%);
+}
+
+.card-sydney {
+  bottom: 10%;
+  right: 6%;
+  width: 235px;
+  height: 265px;
+  transform: rotate(-2deg);
+  background-image:
+    radial-gradient(circle at 28% 16%, rgba(255, 255, 255, 0.18), transparent 26%),
+    linear-gradient(180deg, #d0f0ff 0%, #53a4d3 100%);
 }
 
 .auth-card {
   position: relative;
   z-index: 1;
-  width: min(520px, 100%);
-  border: 1px solid rgba(229, 189, 190, 0.5);
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-  padding: 42px;
+  width: min(540px, 100%);
+  border: none;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 38px 110px rgba(15, 23, 42, 0.14);
+  padding: 44px 38px;
+  backdrop-filter: blur(4px);
+}
+
+@media (max-width: 1100px) {
+  .destination-card {
+    opacity: 0.78;
+  }
+}
+
+@media (max-width: 720px) {
+  .destination-wall {
+    display: none;
+  }
 }
 
 .auth-card-head {
@@ -725,10 +878,40 @@ button.stay-card {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  border: 1px solid #906f70;
+  border: 1px solid transparent;
   background: #ffffff;
   color: #1b1c1c !important;
   font-weight: 800;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.social-grid button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+.social-grid button:first-child {
+  border-color: #d6d9de;
+  background: #ffffff;
+  color: #202124 !important;
+}
+
+..social-grid button:last-child {
+  background: #000000;
+  color: #ffffff !important;
+  border-color: #000000;
+}
+
+.social-grid .social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.social-grid button span {
+  font-weight: 900;
 }
 
 .auth-switch {
@@ -738,7 +921,7 @@ button.stay-card {
 }
 
 .register-shell {
-  background: #fcf9f8;
+  background: transparent;
 }
 
 .register-card {

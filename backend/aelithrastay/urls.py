@@ -18,16 +18,39 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
+from django.http import JsonResponse  # <-- Added for the root view response
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView
 
-from accounts.views import RegisterView, UserViewSet
+from accounts.views import CurrentUserView, EmailOrUsernameTokenObtainPairView, RegisterView, UserViewSet
+from accounts.admin_views import AdminUserViewSet, AdminLogViewSet
 from bookings.views import BookingViewSet
+from bookings.admin_views import AdminDisputeViewSet
 from notifications.views import NotificationViewSet
+from notifications.admin_views import AdminNotificationViewSet
 from payments.views import PaymentViewSet
+from payments.admin_views import AdminPaymentViewSet
 from properties.views import AmenityViewSet, PropertyImageViewSet, PropertyViewSet
+from properties.admin_views import AdminPropertyApprovalViewSet
 from reviews.views import ReviewViewSet
+from reviews.admin_views import AdminReviewModerationViewSet
 from wishlist.views import WishlistViewSet
+
+# Simple view function to handle the empty/root path
+def api_root(request):
+    return JsonResponse({
+        "project": "AelithraStay API Backend",
+        "status": "Running successfully",
+        "endpoints": {
+            "admin": "/admin/",
+            "api_root": "/api/",
+            "auth": {
+                "register": "/api/auth/register/",
+                "login": "/api/auth/login/",
+                "refresh": "/api/auth/refresh/"
+            }
+        }
+    })
 
 router = DefaultRouter()
 router.register('users', UserViewSet, basename='user')
@@ -40,11 +63,22 @@ router.register('reviews', ReviewViewSet, basename='review')
 router.register('wishlist', WishlistViewSet, basename='wishlist')
 router.register('notifications', NotificationViewSet, basename='notification')
 
+# Admin routes
+router.register('admin/users', AdminUserViewSet, basename='admin-user')
+router.register('admin/disputes', AdminDisputeViewSet, basename='admin-dispute')
+router.register('admin/reviews', AdminReviewModerationViewSet, basename='admin-review')
+router.register('admin/properties', AdminPropertyApprovalViewSet, basename='admin-property')
+router.register('admin/payments', AdminPaymentViewSet, basename='admin-payment')
+router.register('admin/notifications', AdminNotificationViewSet, basename='admin-notification')
+router.register('admin/logs', AdminLogViewSet, basename='admin-log')
+
 urlpatterns = [
+    path('', api_root, name='root_index'),  # <-- Fixed: Maps http://127.0.0.1:8000/ to the welcome view
     path('admin/', admin.site.urls),
     path('api/auth/register/', RegisterView.as_view(), name='register'),
-    path('api/auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/auth/login/', EmailOrUsernameTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/auth/me/', CurrentUserView.as_view(), name='current_user'),
     path('api/', include(router.urls)),
 ]
 

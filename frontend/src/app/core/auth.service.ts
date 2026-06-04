@@ -2,11 +2,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { API_BASE_URL } from './api';
-import { Page, User } from './models';
+import { User } from './models';
 
 interface TokenResponse {
   access: string;
   refresh: string;
+}
+
+interface RefreshResponse {
+  access: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -28,14 +32,18 @@ export class AuthService {
     );
   }
 
-  loadMe(): Observable<Page<User>> {
-    return this.http.get<Page<User>>(`${API_BASE_URL}/users/`).pipe(
-      tap((page) => {
-        const user = page.results[0] ?? null;
+  refreshAccessToken(): Observable<RefreshResponse> {
+    const refresh = localStorage.getItem('refresh_token');
+    return this.http.post<RefreshResponse>(`${API_BASE_URL}/auth/refresh/`, { refresh }).pipe(
+      tap((tokens) => localStorage.setItem('access_token', tokens.access))
+    );
+  }
+
+  loadMe(): Observable<User> {
+    return this.http.get<User>(`${API_BASE_URL}/auth/me/`).pipe(
+      tap((user) => {
         this.currentUser.set(user);
-        if (user) {
-          localStorage.setItem('current_user', JSON.stringify(user));
-        }
+        localStorage.setItem('current_user', JSON.stringify(user));
       })
     );
   }
@@ -45,6 +53,11 @@ export class AuthService {
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('current_user');
     this.currentUser.set(null);
+  }
+
+  setCurrentUser(user: User): void {
+    this.currentUser.set(user);
+    localStorage.setItem('current_user', JSON.stringify(user));
   }
 
   isLoggedIn(): boolean {

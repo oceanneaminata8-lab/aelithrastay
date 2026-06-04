@@ -25,7 +25,12 @@ class PaymentViewSet(viewsets.ModelViewSet):
         super().check_object_permissions(request, obj)
 
     def perform_create(self, serializer):
+        from django.db import IntegrityError
+        from rest_framework.exceptions import ValidationError
         booking = serializer.validated_data['booking']
         if not (self.request.user.is_staff or booking.guest_id == self.request.user.id):
             self.permission_denied(self.request)
-        serializer.save(amount=booking.total_price)
+        try:
+            serializer.save(amount=booking.total_price)
+        except IntegrityError:
+            raise ValidationError({"non_field_errors": ["A payment for this booking already exists."]})

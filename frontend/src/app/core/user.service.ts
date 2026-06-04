@@ -16,6 +16,10 @@ export class UserService {
     return this.http.patch<User>(`${API_BASE_URL}/users/${id}/`, payload);
   }
 
+  updateForm(id: number, payload: FormData): Observable<User> {
+    return this.http.patch<User>(`${API_BASE_URL}/users/${id}/`, payload);
+  }
+
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${API_BASE_URL}/users/${id}/`);
   }

@@ -25,8 +25,8 @@ class PropertyViewSet(viewsets.ModelViewSet):
             'reviews',
         )
         user = self.request.user
-        if not (user.is_authenticated and user.is_staff):
-            queryset = queryset.filter(is_active=True)
+        if not (user.is_authenticated and (user.is_staff or user.role == 'admin')):
+            queryset = queryset.filter(is_active=True, approval_status=Property.ApprovalStatus.APPROVED)
 
         city = self.request.query_params.get('city')
         country = self.request.query_params.get('country')
@@ -54,7 +54,10 @@ class PropertyViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(host=self.request.user)
+        approval_status = Property.ApprovalStatus.APPROVED if (
+            self.request.user.is_staff or self.request.user.role == 'admin'
+        ) else Property.ApprovalStatus.PENDING
+        serializer.save(host=self.request.user, approval_status=approval_status)
 
 
 class PropertyImageViewSet(viewsets.ModelViewSet):
@@ -64,12 +67,12 @@ class PropertyImageViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = PropertyImage.objects.select_related('property', 'property__host')
-        if user.is_staff:
+        if user.is_staff or user.role == 'admin':
             return queryset
         return queryset.filter(property__host=user)
 
     def perform_create(self, serializer):
         property_obj = serializer.validated_data['property']
-        if not (self.request.user.is_staff or property_obj.host_id == self.request.user.id):
+        if not (self.request.user.is_staff or self.request.user.role == 'admin' or property_obj.host_id == self.request.user.id):
             self.permission_denied(self.request)
         serializer.save()

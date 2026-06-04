@@ -11,6 +11,12 @@ class Booking(models.Model):
         CANCELLED = 'cancelled', 'Cancelled'
         COMPLETED = 'completed', 'Completed'
 
+    class DisputeStatus(models.TextChoices):
+        NONE = 'none', 'None'
+        OPEN = 'open', 'Open'
+        REVIEWING = 'reviewing', 'Reviewing'
+        RESOLVED = 'resolved', 'Resolved'
+
     guest = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -25,6 +31,13 @@ class Booking(models.Model):
     check_out = models.DateField()
     guests = models.PositiveIntegerField(default=1)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    dispute_status = models.CharField(
+        max_length=20,
+        choices=DisputeStatus.choices,
+        default=DisputeStatus.NONE,
+    )
+    dispute_reason = models.TextField(blank=True)
+    dispute_resolution = models.TextField(blank=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -13,10 +13,18 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Review.objects.select_related('guest', 'property', 'booking')
+        user = self.request.user
+        if not (user.is_authenticated and (user.is_staff or user.role == 'admin')):
+            queryset = queryset.exclude(moderation_status=Review.ModerationStatus.HIDDEN)
         property_id = self.request.query_params.get('property')
         if property_id:
             queryset = queryset.filter(property_id=property_id)
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(guest=self.request.user)
+        from django.db import IntegrityError
+        from rest_framework.exceptions import ValidationError
+        try:
+            serializer.save()
+        except IntegrityError:
+            raise ValidationError({"non_field_errors": ["You have already reviewed this property."]})

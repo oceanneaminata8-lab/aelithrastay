@@ -22,6 +22,11 @@ class Property(models.Model):
         ROOM = 'room', 'Room'
         HOTEL = 'hotel', 'Hotel'
 
+    class ApprovalStatus(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        APPROVED = 'approved', 'Approved'
+        REJECTED = 'rejected', 'Rejected'
+
     host = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -47,6 +52,13 @@ class Property(models.Model):
     bathrooms = models.DecimalField(max_digits=3, decimal_places=1, default=1)
     amenities = models.ManyToManyField(Amenity, related_name='properties', blank=True)
     is_active = models.BooleanField(default=True)
+    approval_status = models.CharField(
+        max_length=20,
+        choices=ApprovalStatus.choices,
+        default=ApprovalStatus.PENDING,
+    )
+    is_reported = models.BooleanField(default=False)
+    moderation_note = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

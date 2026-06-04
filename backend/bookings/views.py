@@ -14,7 +14,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = Booking.objects.select_related('guest', 'property', 'property__host')
-        if user.is_staff:
+        if user.is_staff or user.role == 'admin':
             return queryset
         return queryset.filter(Q(guest=user) | Q(property__host=user)).distinct()
 

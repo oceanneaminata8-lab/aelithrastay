@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AdminDashboardPage } from './pages/admin-dashboard/admin-dashboard.page';
+import { AdminLoginPage } from './pages/admin-login/admin-login.page';
 import { BookingConfirmationPage } from './pages/booking-confirmation/booking-confirmation.page';
 import { authGuard } from './core/auth.guard';
 import { adminGuard } from './core/admin.guard';
@@ -16,6 +17,7 @@ export const routes: Routes = [
   { path: '', component: HomePage },
   { path: 'properties/:id', component: PropertyDetailPage },
   { path: 'login', component: LoginPage },
+  { path: 'admin-login', component: AdminLoginPage },
   { path: 'register', component: RegisterPage },
   { path: 'host', component: HostPage, canActivate: [authGuard] },
   { path: 'admin', component: AdminDashboardPage, canActivate: [adminGuard] },

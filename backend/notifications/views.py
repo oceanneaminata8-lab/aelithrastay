@@ -13,9 +13,14 @@ class NotificationViewSet(viewsets.ModelViewSet):
     ordering_fields = ('created_at', 'is_read')
 
     def get_queryset(self):
+        if self.request.user.is_staff or self.request.user.role == 'admin':
+            return Notification.objects.select_related('user')
         return Notification.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
+        if self.request.user.is_staff or self.request.user.role == 'admin':
+            serializer.save()
+            return
         serializer.save(user=self.request.user)
 
     @action(detail=True, methods=['post'])

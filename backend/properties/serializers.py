@@ -57,6 +57,9 @@ class PropertySerializer(serializers.ModelSerializer):
             'average_rating',
             'review_count',
             'is_active',
+            'approval_status',
+            'is_reported',
+            'moderation_note',
             'created_at',
             'updated_at',
         )

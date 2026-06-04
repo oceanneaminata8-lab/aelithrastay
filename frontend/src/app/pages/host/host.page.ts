@@ -110,9 +110,16 @@ import { PropertyService } from '../../core/property.service';
                 </div>
               </div>
 
-              <button type="submit" class="submit-btn" [disabled]="form.invalid">
-                <span>Publish Listing</span>
-                <span class="material-symbols-outlined">rocket_launch</span>
+              @if (error()) {
+                <div class="form-error">
+                  <span class="material-symbols-outlined">error</span>
+                  {{ error() }}
+                </div>
+              }
+
+              <button type="submit" class="submit-btn" [disabled]="form.invalid || isSubmitting()">
+                <span>{{ isSubmitting() ? 'Publishing...' : 'Publish Listing' }}</span>
+                <span class="material-symbols-outlined">{{ isSubmitting() ? 'hourglass_top' : 'rocket_launch' }}</span>
               </button>
             </form>
           </div>
@@ -399,6 +406,19 @@ import { PropertyService } from '../../core/property.service';
       cursor: not-allowed;
     }
 
+    .form-error {
+      background: #fff5f5;
+      color: #c53030;
+      padding: 12px 16px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: 1px solid #feb2b2;
+    }
+
     .inventory-header {
       display: flex;
       justify-content: space-between;
@@ -581,6 +601,9 @@ export class HostPage {
 
   protected readonly properties = signal<Property[]>([]);
   protected readonly notice = signal('');
+  protected readonly loading = signal(false);
+  protected readonly error = signal('');
+  protected readonly isSubmitting = signal(false);
   protected readonly form = this.fb.nonNullable.group({
     title: ['', Validators.required],
     description: ['', Validators.required],
@@ -612,24 +635,37 @@ export class HostPage {
   }
 
   create(): void {
-    if (this.form.invalid) return;
-    this.propertiesApi.create(this.form.getRawValue()).subscribe(() => {
-      this.form.reset({
-        title: '',
-        description: '',
-        property_type: 'apartment',
-        address: '',
-        city: '',
-        country: '',
-        price_per_night: 100,
-        cleaning_fee: 0,
-        max_guests: 2,
-        bedrooms: 1,
-        beds: 1,
-        bathrooms: 1
-      });
-      this.load();
-      this.showNotice('Listing published successfully!');
+    if (this.form.invalid || this.isSubmitting()) return;
+    this.isSubmitting.set(true);
+    this.error.set('');
+    this.propertiesApi.create(this.form.getRawValue()).subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
+        this.form.reset({
+          title: '',
+          description: '',
+          property_type: 'apartment',
+          address: '',
+          city: '',
+          country: '',
+          price_per_night: 100,
+          cleaning_fee: 0,
+          max_guests: 2,
+          bedrooms: 1,
+          beds: 1,
+          bathrooms: 1
+        });
+        this.load();
+        this.showNotice('Listing published successfully!');
+      },
+      error: (err) => {
+        this.isSubmitting.set(false);
+        if (err.status === 403) {
+          this.error.set('You do not have permission to host. Please register as a Host.');
+        } else {
+          this.error.set('Could not publish listing. Please check all fields.');
+        }
+      }
     });
   }
 

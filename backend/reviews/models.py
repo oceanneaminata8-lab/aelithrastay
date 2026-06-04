@@ -3,6 +3,12 @@ from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Review(models.Model):
+    class ModerationStatus(models.TextChoices):
+        CLEAN = 'clean', 'Clean'
+        REPORTED = 'reported', 'Reported'
+        HIDDEN = 'hidden', 'Hidden'
+        RESOLVED = 'resolved', 'Resolved'
+
     guest = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -22,6 +28,12 @@ class Review(models.Model):
     )
     rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     comment = models.TextField(blank=True)
+    moderation_status = models.CharField(
+        max_length=20,
+        choices=ModerationStatus.choices,
+        default=ModerationStatus.CLEAN,
+    )
+    moderation_note = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

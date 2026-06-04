@@ -26,9 +26,9 @@ import { AuthService } from '../../core/auth.service';
                 <span class="material-symbols-outlined">share</span>
                 Share
               </button>
-              <button type="button" class="action-btn" (click)="addWishlist(stay.id)">
-                <span class="material-symbols-outlined">favorite</span>
-                Save
+              <button type="button" class="action-btn" (click)="addWishlist(stay.id)" [disabled]="isAddingWishlist()">
+                <span class="material-symbols-outlined">{{ isAddingWishlist() ? 'hourglass_top' : 'favorite' }}</span>
+                {{ isAddingWishlist() ? 'Saving...' : 'Save' }}
               </button>
             </div>
           </div>
@@ -163,8 +163,8 @@ import { AuthService } from '../../core/auth.service';
                   }
                 </div>
                 <textarea formControlName="comment" placeholder="How was your stay?"></textarea>
-                <button type="submit" class="btn-post-review" [disabled]="reviewForm.invalid">
-                  Post Review
+                <button type="submit" class="btn-post-review" [disabled]="reviewForm.invalid || isSubmittingReview()">
+                  {{ isSubmittingReview() ? 'Posting...' : 'Post Review' }}
                   <span class="material-symbols-outlined">send</span>
                 </button>
               </form>
@@ -220,7 +220,9 @@ import { AuthService } from '../../core/auth.service';
                   <span>Guests</span>
                   <input formControlName="guests" type="number" min="1" [max]="stay.max_guests" />
                 </label>
-                <button type="submit" class="book-btn" [disabled]="bookingForm.invalid">Reserve</button>
+                <button type="submit" class="book-btn" [disabled]="bookingForm.invalid || isSubmittingBooking()">
+                  {{ isSubmittingBooking() ? 'Reserving...' : 'Reserve' }}
+                </button>
                 <p class="charge-notice">You won't be charged yet</p>
               </form>
 
@@ -472,6 +474,9 @@ export class PropertyDetailPage {
   protected readonly message = signal('');
   protected readonly showFullDescription = signal(false);
   protected readonly showAllAmenities = signal(false);
+  protected readonly isSubmittingReview = signal(false);
+  protected readonly isSubmittingBooking = signal(false);
+  protected readonly isAddingWishlist = signal(false);
   protected readonly Number = Number;
 
   private readonly fallbackImages = [
@@ -536,12 +541,15 @@ export class PropertyDetailPage {
       return;
     }
 
+    this.isSubmittingBooking.set(true);
     this.bookingsApi.create({ property, ...this.bookingForm.getRawValue() }).subscribe({
       next: (booking) => {
+        this.isSubmittingBooking.set(false);
         this.flash('Reservation successful! Redirecting...');
         setTimeout(() => this.router.navigate(['/booking-confirmation', booking.id]), 1500);
       },
       error: (err) => {
+        this.isSubmittingBooking.set(false);
         const msg = err.error?.non_field_errors?.[0] || 'Could not create booking. Please check availability.';
         this.flash(msg);
       }
@@ -556,13 +564,16 @@ export class PropertyDetailPage {
     }
 
     if (this.reviewForm.invalid) return;
+    this.isSubmittingReview.set(true);
     this.reviewsApi.create({ property, ...this.reviewForm.getRawValue() }).subscribe({
       next: () => {
+        this.isSubmittingReview.set(false);
         this.reviewForm.patchValue({ comment: '', rating: 5 });
         this.loadReviews(property);
         this.flash('Thank you for your review!');
       },
       error: (err) => {
+        this.isSubmittingReview.set(false);
         if (err.status === 400 && err.error?.non_field_errors?.[0]?.includes('unique')) {
           this.flash('You have already reviewed this property.');
         } else {
@@ -573,9 +584,21 @@ export class PropertyDetailPage {
   }
 
   addWishlist(property: number): void {
+    if (this.isAddingWishlist()) return;
+    this.isAddingWishlist.set(true);
     this.wishlistApi.add(property).subscribe({
-      next: () => this.flash('Added to your wishlist!'),
-      error: () => this.flash('Could not save. Login may be required.')
+      next: () => {
+        this.isAddingWishlist.set(false);
+        this.flash('Added to your wishlist!');
+      },
+      error: (err) => {
+        this.isAddingWishlist.set(false);
+        if (err.status === 400) {
+          this.flash('Already in your wishlist.');
+        } else {
+          this.flash('Could not save. Login may be required.');
+        }
+      }
     });
   }
 

@@ -1,16 +1,18 @@
-import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Booking, Property, User } from '../../core/models';
 import { BookingService } from '../../core/booking.service';
 import { PropertyService } from '../../core/property.service';
 import { UserService } from '../../core/user.service';
+import { AdminService, Dispute, ReviewModeration, PropertyModeration, AdminUser } from '../../core/admin.service';
 
-type AdminPanel = 'dashboard' | 'properties' | 'reservations' | 'users' | 'analytics' | 'locations';
+type AdminPanel = 'dashboard' | 'properties' | 'reservations' | 'users' | 'analytics' | 'locations' | 'disputes' | 'reviews' | 'property-approval' | 'notifications';
 
 @Component({
   selector: 'app-admin-dashboard-page',
-  imports: [CurrencyPipe, DatePipe, DecimalPipe, RouterLink],
+  standalone: true,
+  imports: [CommonModule, CurrencyPipe, DatePipe, DecimalPipe, RouterLink],
   template: `
     <section class="admin-layout">
       <aside class="admin-sidebar">
@@ -21,8 +23,12 @@ type AdminPanel = 'dashboard' | 'properties' | 'reservations' | 'users' | 'analy
         <nav>
           <button type="button" [class.active]="activePanel() === 'dashboard'" (click)="switchPanel('dashboard')"><span class="material-symbols-outlined">dashboard</span>Dashboard</button>
           <button type="button" [class.active]="activePanel() === 'properties'" (click)="switchPanel('properties')"><span class="material-symbols-outlined">home_work</span>Property Listings</button>
+          <button type="button" [class.active]="activePanel() === 'property-approval'" (click)="switchPanel('property-approval')"><span class="material-symbols-outlined">fact_check</span>Property Approval</button>
           <button type="button" [class.active]="activePanel() === 'reservations'" (click)="switchPanel('reservations')"><span class="material-symbols-outlined">calendar_month</span>Reservations</button>
+          <button type="button" [class.active]="activePanel() === 'disputes'" (click)="switchPanel('disputes')"><span class="material-symbols-outlined">gavel</span>Disputes</button>
+          <button type="button" [class.active]="activePanel() === 'reviews'" (click)="switchPanel('reviews')"><span class="material-symbols-outlined">rate_review</span>Review Moderation</button>
           <button type="button" [class.active]="activePanel() === 'users'" (click)="switchPanel('users')"><span class="material-symbols-outlined">group</span>User Management</button>
+          <button type="button" [class.active]="activePanel() === 'notifications'" (click)="switchPanel('notifications')"><span class="material-symbols-outlined">notifications</span>Notifications</button>
           <button type="button" [class.active]="activePanel() === 'analytics'" (click)="switchPanel('analytics')"><span class="material-symbols-outlined">analytics</span>Analytics</button>
         </nav>
         <a class="admin-add" routerLink="/host">Add New Listing</a>
@@ -164,6 +170,7 @@ type AdminPanel = 'dashboard' | 'properties' | 'reservations' | 'users' | 'analy
                     <th>User</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Status</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -173,6 +180,13 @@ type AdminPanel = 'dashboard' | 'properties' | 'reservations' | 'users' | 'analy
                       <td>{{ user.first_name }} {{ user.last_name }} ({{ user.username }})</td>
                       <td>{{ user.email }}</td>
                       <td><span class="status-pill active">{{ user.role }}</span></td>
+                      <td>
+                        @if (user.is_suspended) {
+                          <span class="status-pill cancelled">Suspended</span>
+                        } @else {
+                          <span class="status-pill active">Active</span>
+                        }
+                      </td>
                       <td>
                         <div class="table-actions">
                           @if (user.role === 'guest') {
@@ -185,6 +199,15 @@ type AdminPanel = 'dashboard' | 'properties' | 'reservations' | 'users' | 'analy
                               <span class="material-symbols-outlined">verified_user</span>
                             </button>
                           }
+                          @if (!user.is_suspended) {
+                            <button class="btn-icon delete" (click)="suspendUser(user.id)" title="Suspend User">
+                              <span class="material-symbols-outlined">block</span>
+                            </button>
+                          } @else {
+                            <button class="btn-icon" (click)="activateUser(user.id)" title="Activate User" style="background: #e6fff6;">
+                              <span class="material-symbols-outlined" style="color: #008558;">check_circle</span>
+                            </button>
+                          }
                           <button class="btn-icon delete" (click)="deleteUser(user.id)" title="Delete User">
                             <span class="material-symbols-outlined">delete</span>
                           </button>
@@ -194,6 +217,167 @@ type AdminPanel = 'dashboard' | 'properties' | 'reservations' | 'users' | 'analy
                   }
                 </tbody>
               </table>
+            </article>
+          </section>
+        }
+
+        @if (activePanel() === 'disputes') {
+          <section class="admin-panel-card" id="disputes">
+            <article class="admin-table-card">
+              <div class="admin-card-head">
+                <h3>Booking Disputes</h3>
+                <span style="font-size: 0.9rem; color: var(--admin-muted);">{{ disputes().length }} active</span>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Guest</th>
+                    <th>Property</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (dispute of disputes(); track dispute.id) {
+                    <tr>
+                      <td>{{ dispute.guest_name }}</td>
+                      <td>{{ dispute.property_title }}</td>
+                      <td>{{ dispute.dispute_reason | slice:0:30 }}...</td>
+                      <td><span class="status-pill pending">{{ dispute.dispute_status }}</span></td>
+                      <td>
+                        <div class="table-actions">
+                          @if (dispute.dispute_status !== 'reviewing') {
+                            <button class="btn-icon" (click)="markDisputeReviewing(dispute.id)" title="Mark as Under Review">
+                              <span class="material-symbols-outlined">assignment</span>
+                            </button>
+                          }
+                          <button class="btn-icon" (click)="resolveDispute(dispute.id)" title="Resolve Dispute">
+                            <span class="material-symbols-outlined">check_circle</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="5" style="text-align: center; padding: 40px;">No active disputes</td></tr>
+                  }
+                </tbody>
+              </table>
+            </article>
+          </section>
+        }
+
+        @if (activePanel() === 'reviews') {
+          <section class="admin-panel-card" id="reviews">
+            <article class="admin-table-card">
+              <div class="admin-card-head">
+                <h3>Review Moderation</h3>
+                <span style="font-size: 0.9rem; color: var(--admin-muted);">{{ reviewsForModeration().length }} to review</span>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Reviewer</th>
+                    <th>Property</th>
+                    <th>Rating</th>
+                    <th>Comment</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (review of reviewsForModeration(); track review.id) {
+                    <tr>
+                      <td>{{ review.guest_name }}</td>
+                      <td>{{ review.property_title }}</td>
+                      <td>★ {{ review.rating }}/5</td>
+                      <td>{{ review.comment | slice:0:25 }}...</td>
+                      <td><span class="status-pill reported">{{ review.moderation_status }}</span></td>
+                      <td>
+                        <div class="table-actions">
+                          <button class="btn-icon" (click)="approveReview(review.id)" title="Approve Review">
+                            <span class="material-symbols-outlined">check_circle</span>
+                          </button>
+                          <button class="btn-icon delete" (click)="hideReview(review.id)" title="Hide Review">
+                            <span class="material-symbols-outlined">visibility_off</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="6" style="text-align: center; padding: 40px;">No reviews to moderate</td></tr>
+                  }
+                </tbody>
+              </table>
+            </article>
+          </section>
+        }
+
+        @if (activePanel() === 'property-approval') {
+          <section class="admin-panel-card" id="property-approval">
+            <article class="admin-table-card">
+              <div class="admin-card-head">
+                <h3>Property Approval Queue</h3>
+                <span style="font-size: 0.9rem; color: var(--admin-muted);">{{ propertiesForApproval().length }} pending</span>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Property</th>
+                    <th>Host</th>
+                    <th>Type</th>
+                    <th>Price/Night</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (property of propertiesForApproval(); track property.id) {
+                    <tr>
+                      <td>{{ property.title }}</td>
+                      <td>{{ property.host_name }}</td>
+                      <td>Property</td>
+                      <td>-</td>
+                      <td><span class="status-pill pending">{{ property.approval_status }}</span></td>
+                      <td>
+                        <div class="table-actions">
+                          @if (property.approval_status === 'pending') {
+                            <button class="btn-icon" (click)="approveProperty(property.id)" title="Approve Property">
+                              <span class="material-symbols-outlined">check_circle</span>
+                            </button>
+                            <button class="btn-icon delete" (click)="rejectProperty(property.id)" title="Reject Property">
+                              <span class="material-symbols-outlined">cancel</span>
+                            </button>
+                          }
+                        </div>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="6" style="text-align: center; padding: 40px;">No properties pending approval</td></tr>
+                  }
+                </tbody>
+              </table>
+            </article>
+          </section>
+        }
+
+        @if (activePanel() === 'notifications') {
+          <section class="admin-panel-card" id="notifications">
+            <article class="admin-table-card">
+              <div class="admin-card-head">
+                <h3>Admin Notifications Center</h3>
+                <button type="button" (click)="sendNotification()">Send Notification</button>
+              </div>
+              <div style="padding: 24px;">
+                <p style="color: var(--admin-muted); margin-bottom: 24px;">Use this panel to send important notifications to users across the platform.</p>
+                <div style="display: grid; gap: 16px;">
+                  <div style="padding: 16px; background: #fdf2f2; border-radius: 8px; border-left: 4px solid var(--admin-primary);">
+                    <strong style="display: block; margin-bottom: 4px;">Send to All Users</strong>
+                    <p style="margin: 0; font-size: 0.9rem; color: var(--admin-muted);">Broadcast a notification to every user on the platform.</p>
+                    <button (click)="sendNotification()" style="margin-top: 12px; padding: 8px 16px; background: var(--admin-primary); color: white; border: 0; border-radius: 6px; cursor: pointer;">Send Broadcast</button>
+                  </div>
+                </div>
+              </div>
             </article>
           </section>
         }
@@ -584,6 +768,13 @@ type AdminPanel = 'dashboard' | 'properties' | 'reservations' | 'users' | 'analy
     .status-pill.active, .status-pill.confirmed { background: #e6fff6; color: #008558; }
     .status-pill.cancelled { background: #fff1f1; color: #ba0036; }
     .status-pill.pending { background: #fff8e6; color: #855800; }
+    .status-pill.reported { background: #fff1f1; color: #ba0036; }
+    .status-pill.reviewing { background: #fff8e6; color: #855800; }
+    .status-pill.resolved { background: #e6fff6; color: #008558; }
+    .status-pill.clean { background: #e6fff6; color: #008558; }
+    .status-pill.hidden { background: #f0f0f0; color: #666; }
+    .status-pill.approved { background: #e6fff6; color: #008558; }
+    .status-pill.rejected { background: #fff1f1; color: #ba0036; }
 
     .table-actions {
       display: flex;
@@ -811,14 +1002,23 @@ export class AdminDashboardPage {
   private readonly bookingApi = inject(BookingService);
   private readonly propertyApi = inject(PropertyService);
   private readonly userApi = inject(UserService);
+  private readonly adminApi = inject(AdminService);
   private readonly router = inject(Router);
 
   protected readonly bookings = signal<Booking[]>([]);
   protected readonly properties = signal<Property[]>([]);
-  protected readonly users = signal<User[]>([]);
+  protected readonly users = signal<AdminUser[]>([]);
+  protected readonly disputes = signal<Dispute[]>([]);
+  protected readonly reviewsForModeration = signal<ReviewModeration[]>([]);
+  protected readonly propertiesForApproval = signal<PropertyModeration[]>([]);
   protected readonly activePanel = signal<AdminPanel>('dashboard');
   protected readonly search = signal('');
   protected readonly notice = signal('');
+  protected readonly revenueStats = signal<any>({});
+  protected readonly paymentStats = signal<any>({});
+  protected readonly disputeStats = signal<any>({});
+  protected readonly reviewStats = signal<any>({});
+  protected readonly propertyStats = signal<any>({});
 
   protected readonly revenue = computed(() => this.bookings().reduce((sum, item) => sum + Number(item.total_price || 0), 0));
   protected readonly goalProgress = computed(() => Math.min(100, Math.round((this.revenue() / 10000) * 100)));
@@ -872,12 +1072,22 @@ export class AdminDashboardPage {
   refreshAll(): void {
     this.bookingApi.list().subscribe((page) => this.bookings.set(page.results));
     this.propertyApi.list().subscribe((page) => this.properties.set(page.results));
-    this.userApi.list().subscribe((page) => this.users.set(page.results));
+    this.userApi.list().subscribe((page) => this.users.set(page.results as any));
+    this.adminApi.getDisputes().subscribe((disputes) => this.disputes.set(disputes));
+    this.adminApi.getReviewsForModeration().subscribe((reviews) => this.reviewsForModeration.set(reviews));
+    this.adminApi.getPropertiesForApproval().subscribe((props) => this.propertiesForApproval.set(props));
+    this.adminApi.getPaymentStats().subscribe((stats) => {
+      this.paymentStats.set(stats);
+      this.revenueStats.set({ total: stats.total_revenue, refunded: stats.total_refunded });
+    });
+    this.adminApi.getDisputeStats().subscribe((stats) => this.disputeStats.set(stats));
+    this.adminApi.getReviewStats().subscribe((stats) => this.reviewStats.set(stats));
+    this.adminApi.getPropertyStats().subscribe((stats) => this.propertyStats.set(stats));
   }
 
   refreshUsers(): void {
     this.userApi.list().subscribe((page) => {
-      this.users.set(page.results);
+      this.users.set(page.results as AdminUser[]);
       this.showNotice('User list refreshed.');
     });
   }
@@ -886,8 +1096,12 @@ export class AdminDashboardPage {
     const titles: Record<AdminPanel, string> = {
       dashboard: 'Dashboard Overview',
       properties: 'Property Listings',
+      'property-approval': 'Property Approval',
       reservations: 'Reservations',
+      disputes: 'Booking Disputes',
+      reviews: 'Review Moderation',
       users: 'User Management',
+      notifications: 'Admin Notifications',
       analytics: 'Analytics',
       locations: 'Locations'
     };
@@ -895,9 +1109,19 @@ export class AdminDashboardPage {
   }
 
   pageSubtitle(): string {
-    return this.activePanel() === 'dashboard'
-      ? 'Welcome back. Here is what is happening today across AelithraStay.'
-      : 'Use the tools below to review and manage this area.';
+    const subtitles: Record<AdminPanel, string> = {
+      dashboard: 'Welcome back. Here is what is happening today across AelithraStay.',
+      'property-approval': 'Review and approve property listings before they go live.',
+      disputes: 'Manage and resolve booking disputes.',
+      reviews: 'Moderate reviews and manage reported content.',
+      notifications: 'Send notifications to users.',
+      analytics: 'View platform revenue and analytics.',
+      locations: 'View active cities and countries.',
+      properties: 'Manage all property listings.',
+      reservations: 'View and manage all reservations.',
+      users: 'Manage user accounts and roles.'
+    };
+    return subtitles[this.activePanel()];
   }
 
   propertyImage(index: number): string {
@@ -937,7 +1161,7 @@ export class AdminDashboardPage {
 
   updateUserRole(id: number, role: 'admin' | 'host' | 'guest'): void {
     this.userApi.update(id, { role }).subscribe((updatedUser) => {
-      this.users.update(us => us.map(u => u.id === id ? updatedUser : u));
+      this.users.update(us => us.map(u => u.id === id ? updatedUser as AdminUser : u));
       this.showNotice(`User role updated to ${role}.`);
     });
   }
@@ -983,5 +1207,88 @@ export class AdminDashboardPage {
   showNotice(message: string): void {
     this.notice.set(message);
     window.setTimeout(() => this.notice.set(''), 2600);
+  }
+
+  // DISPUTE MANAGEMENT
+  resolveDispute(id: number): void {
+    const resolution = prompt('Enter resolution details:');
+    if (resolution) {
+      this.adminApi.resolveDispute(id, resolution).subscribe(() => {
+        this.disputes.update(ds => ds.filter(d => d.id !== id));
+        this.showNotice('Dispute resolved successfully.');
+      });
+    }
+  }
+
+  markDisputeReviewing(id: number): void {
+    this.adminApi.markDisputeReviewing(id).subscribe(() => {
+      this.showNotice('Dispute marked as under review.');
+      this.refreshAll();
+    });
+  }
+
+  // REVIEW MODERATION
+  hideReview(id: number): void {
+    const note = prompt('Enter reason for hiding this review:');
+    if (note) {
+      this.adminApi.hideReview(id, note).subscribe(() => {
+        this.reviewsForModeration.update(rs => rs.filter(r => r.id !== id));
+        this.showNotice('Review hidden successfully.');
+      });
+    }
+  }
+
+  approveReview(id: number): void {
+    this.adminApi.resolveReviewReport(id, 'Approved').subscribe(() => {
+      this.reviewsForModeration.update(rs => rs.filter(r => r.id !== id));
+      this.showNotice('Review approved.');
+    });
+  }
+
+  // PROPERTY APPROVAL
+  approveProperty(id: number): void {
+    const note = prompt('Enter approval notes (optional):');
+    this.adminApi.approveProperty(id, note || undefined).subscribe(() => {
+      this.propertiesForApproval.update(ps => ps.filter(p => p.id !== id));
+      this.showNotice('Property approved successfully.');
+    });
+  }
+
+  rejectProperty(id: number): void {
+    const reason = prompt('Enter rejection reason:');
+    if (reason) {
+      this.adminApi.rejectProperty(id, reason).subscribe(() => {
+        this.propertiesForApproval.update(ps => ps.filter(p => p.id !== id));
+        this.showNotice('Property rejected.');
+      });
+    }
+  }
+
+  // USER MANAGEMENT - NEW
+  suspendUser(id: number): void {
+    if (confirm('Are you sure you want to suspend this user?')) {
+      this.adminApi.suspendUser(id).subscribe(() => {
+        this.users.update(us => us.map(u => u.id === id ? { ...u, is_suspended: true } : u));
+        this.showNotice('User suspended successfully.');
+      });
+    }
+  }
+
+  activateUser(id: number): void {
+    this.adminApi.activateUser(id).subscribe(() => {
+      this.users.update(us => us.map(u => u.id === id ? { ...u, is_suspended: false } : u));
+      this.showNotice('User activated successfully.');
+    });
+  }
+
+  // NOTIFICATIONS
+  sendNotification(): void {
+    const titlePrompt = prompt('Notification title:');
+    if (!titlePrompt) return;
+    const messagePrompt = prompt('Notification message:');
+    if (!messagePrompt) return;
+    this.adminApi.sendNotificationToAll(titlePrompt, messagePrompt).subscribe(() => {
+      this.showNotice('Notification sent to all users.');
+    });
   }
 }
