@@ -15,7 +15,7 @@ import dj_database_url
 from datetime import timedelta
 from pathlib import Path
 
-FRONTEND_URL = os.environ.get("ANGULAR_APP_URL", "http://localhost:4200")
+FRONTEND_URL = os.environ.get("ANGULAR_APP_URL", "https://aelithrastay-frontend.vercel.app")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,12 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=5i*5^plk060f8qc!-rv9+h=*^d)i$dzo^660e+v)vi%(sn5qx'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-=5i*5^plk060f8qc!-rv9+h=*^d)i$dzo^660e+v)vi%(sn5qx')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['aelithrastay-backend.onrender.com', 'localhost', '127.0.0.1', '*']
+
+# Trust Render's proxy for HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
