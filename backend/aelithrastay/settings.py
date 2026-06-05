@@ -32,7 +32,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    "unfold",
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -140,7 +140,7 @@ AUTH_USER_MODEL = 'accounts.User'
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:4200',
     'http://127.0.0.1:4200',
-    'https://your-app.vercel.app',
+    'https://aelithrastay-frontend.vercel.app',
 ]
 
 REST_FRAMEWORK = {
@@ -161,14 +161,4 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-}
-UNFOLD = {
-    "SITE_TITLE": "AelithraStay Admin",
-    "SITE_HEADER": "AelithraStay Backend Management",
-    "SHOW_HISTORY": True,
-    "DARK_MODE": True,  # Allows you to toggle a sleek dark/light mode
-    "SIDEBAR": {
-        "show_search": True,  # Adds a beautiful search bar to the sidebar
-        "show_all_applications": True,
-    },
 }
