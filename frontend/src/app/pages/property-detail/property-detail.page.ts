@@ -8,6 +8,7 @@ import { PropertyService } from '../../core/property.service';
 import { ReviewService } from '../../core/review.service';
 import { WishlistService } from '../../core/wishlist.service';
 import { AuthService } from '../../core/auth.service';
+import { LanguageService } from '../../core/language.service';
 
 @Component({
   selector: 'app-property-detail-page',
@@ -19,16 +20,16 @@ import { AuthService } from '../../core/auth.service';
           <div class="header-top">
             <a routerLink="/" class="back-link">
               <span class="material-symbols-outlined">arrow_back</span>
-              Explore stays
+              {{ language.t('exploreStays') }}
             </a>
             <div class="header-actions">
               <button type="button" class="action-btn" (click)="share()">
                 <span class="material-symbols-outlined">share</span>
-                Share
+                {{ language.t('share') }}
               </button>
               <button type="button" class="action-btn" (click)="addWishlist(stay.id)" [disabled]="isAddingWishlist()">
                 <span class="material-symbols-outlined">{{ isAddingWishlist() ? 'hourglass_top' : 'favorite' }}</span>
-                {{ isAddingWishlist() ? 'Saving...' : 'Save' }}
+                {{ isAddingWishlist() ? language.t('saving') : language.t('save') }}
               </button>
             </div>
           </div>
@@ -36,8 +37,8 @@ import { AuthService } from '../../core/auth.service';
           <div class="header-meta">
             <div class="rating">
               <span class="material-symbols-outlined">star</span>
-              <strong>{{ stay.average_rating || 'New' }}</strong>
-              <span class="muted">({{ stay.review_count }} reviews)</span>
+              <strong>{{ stay.average_rating || language.t('new') }}</strong>
+              <span class="muted">({{ stay.review_count }} {{ language.t('reviewsCount') }})</span>
             </div>
             <span class="separator">·</span>
             <address>{{ stay.city }}, {{ stay.country }}</address>
@@ -77,8 +78,13 @@ import { AuthService } from '../../core/auth.service';
           <section class="main-content">
             <div class="host-info">
               <div>
-                <h2>Entire {{ stay.property_type }} hosted by {{ stay.host }}</h2>
-                <p>{{ stay.max_guests }} guests · {{ stay.bedrooms }} bedrooms · {{ stay.beds }} beds · {{ stay.bathrooms }} baths</p>
+                <h2>{{ language.t('entire') }} {{ stay.property_type }} {{ language.t('hostedBy') }} {{ stay.host }}</h2>
+                <p>
+                  {{ stay.max_guests }} {{ language.t('guestsCount') }} · 
+                  {{ stay.bedrooms }} {{ stay.bedrooms > 1 ? language.t('bedrooms') : language.t('bedroom') }} · 
+                  {{ stay.beds }} {{ stay.beds > 1 ? language.t('beds') : language.t('bed') }} · 
+                  {{ stay.bathrooms }} {{ +stay.bathrooms > 1 ? language.t('baths') : language.t('bath') }}
+                </p>
               </div>
               <div class="host-avatar">
                 <span class="material-symbols-outlined">account_circle</span>
@@ -91,22 +97,22 @@ import { AuthService } from '../../core/auth.service';
               <div class="highlight-item">
                 <span class="material-symbols-outlined">workspace_premium</span>
                 <div>
-                  <strong>{{ stay.host }} is a Superhost</strong>
-                  <p>Superhosts are experienced, highly rated hosts who are committed to providing great stays for guests.</p>
+                  <strong>{{ stay.host }} {{ language.t('superhost') }}</strong>
+                  <p>{{ language.t('superhostDesc') }}</p>
                 </div>
               </div>
               <div class="highlight-item">
                 <span class="material-symbols-outlined">location_on</span>
                 <div>
-                  <strong>Great location</strong>
-                  <p>95% of recent guests gave the location a 5-star rating.</p>
+                  <strong>{{ language.t('greatLocation') }}</strong>
+                  <p>{{ language.t('greatLocationDesc') }}</p>
                 </div>
               </div>
               <div class="highlight-item">
                 <span class="material-symbols-outlined">calendar_today</span>
                 <div>
-                  <strong>Free cancellation for 48 hours</strong>
-                  <p>Get a full refund if you change your mind.</p>
+                  <strong>{{ language.t('freeCancellation') }}</strong>
+                  <p>{{ language.t('freeCancellationDesc') }}</p>
                 </div>
               </div>
             </div>
@@ -114,10 +120,10 @@ import { AuthService } from '../../core/auth.service';
             <hr class="divider" />
 
             <article class="description">
-              <h3>About this place</h3>
+              <h3>{{ language.t('aboutPlace') }}</h3>
               <p [class.expanded]="showFullDescription()">{{ stay.description }}</p>
               <button class="show-more" (click)="showFullDescription.set(!showFullDescription())">
-                {{ showFullDescription() ? 'Show less' : 'Show more' }} 
+                {{ showFullDescription() ? language.t('showLess') : language.t('showMore') }} 
                 <span class="material-symbols-outlined">{{ showFullDescription() ? 'expand_less' : 'chevron_right' }}</span>
               </button>
             </article>
@@ -125,7 +131,7 @@ import { AuthService } from '../../core/auth.service';
             <hr class="divider" />
 
             <section class="amenities">
-              <h3>What this place offers</h3>
+              <h3>{{ language.t('offers') }}</h3>
               <div class="amenity-grid" [class.all]="showAllAmenities()">
                 @for (amenity of (showAllAmenities() ? stay.amenities : stay.amenities.slice(0, 6)); track amenity.id) {
                   <div class="amenity-item">
@@ -133,12 +139,12 @@ import { AuthService } from '../../core/auth.service';
                     <span>{{ amenity.name }}</span>
                   </div>
                 } @empty {
-                  <p class="muted">Essential amenities provided by the host.</p>
+                  <p class="muted">{{ language.t('essentialAmenities') }}</p>
                 }
               </div>
               @if (stay.amenities.length > 6) {
                 <button class="btn-outline" (click)="showAllAmenities.set(!showAllAmenities())">
-                  {{ showAllAmenities() ? 'Hide amenities' : 'Show all ' + stay.amenities.length + ' amenities' }}
+                  {{ showAllAmenities() ? language.t('hideAmenities') : language.t('showAllAmenities') + ' ' + stay.amenities.length + ' amenities' }}
                 </button>
               }
             </section>
@@ -149,12 +155,12 @@ import { AuthService } from '../../core/auth.service';
               <div class="reviews-header">
                 <h3>
                   <span class="material-symbols-outlined">star</span>
-                  {{ stay.average_rating || 'New' }} · {{ stay.review_count }} reviews
+                  {{ stay.average_rating || language.t('new') }} · {{ stay.review_count }} {{ language.t('reviewsCount') }}
                 </h3>
               </div>
               
               <form class="review-form" [formGroup]="reviewForm" (ngSubmit)="review(stay.id)">
-                <h4>Leave a review</h4>
+                <h4>{{ language.t('leaveReview') }}</h4>
                 <div class="rating-input">
                   @for (star of [1,2,3,4,5]; track star) {
                     <button type="button" (click)="reviewForm.patchValue({rating: star})">
@@ -162,9 +168,9 @@ import { AuthService } from '../../core/auth.service';
                     </button>
                   }
                 </div>
-                <textarea formControlName="comment" placeholder="How was your stay?"></textarea>
+                <textarea formControlName="comment" [placeholder]="language.t('howWasStay')"></textarea>
                 <button type="submit" class="btn-post-review" [disabled]="reviewForm.invalid || isSubmittingReview()">
-                  {{ isSubmittingReview() ? 'Posting...' : 'Post Review' }}
+                  {{ isSubmittingReview() ? language.t('posting') : language.t('postReview') }}
                   <span class="material-symbols-outlined">send</span>
                 </button>
               </form>
@@ -185,7 +191,7 @@ import { AuthService } from '../../core/auth.service';
                   </article>
                 } @empty {
                   <div class="empty-reviews">
-                    <p>No reviews yet for this property. Be the first to share your experience!</p>
+                    <p>{{ language.t('noReviewsYet') }}</p>
                   </div>
                 }
               </div>
@@ -197,51 +203,129 @@ import { AuthService } from '../../core/auth.service';
               <div class="price-header">
                 <div>
                   <span class="amount">{{ stay.price_per_night | currency:'XAF':'symbol':'1.0-0' }}</span>
-                  <span class="unit">night</span>
+                  <span class="unit">{{ language.t('night') }}</span>
                 </div>
                 <div class="rating-summary">
                   <span class="material-symbols-outlined">star</span>
-                  <strong>{{ stay.average_rating || 'New' }}</strong>
+                  <strong>{{ stay.average_rating || language.t('new') }}</strong>
                 </div>
               </div>
 
               <form class="booking-form" [formGroup]="bookingForm" (ngSubmit)="book(stay.id)">
                 <div class="date-inputs">
                   <label class="check-in">
-                    <span>Check-in</span>
+                    <span>{{ language.t('checkIn') }}</span>
                     <input formControlName="check_in" type="date" />
                   </label>
                   <label class="check-out">
-                    <span>Check-out</span>
+                    <span>{{ language.t('checkOut') }}</span>
                     <input formControlName="check_out" type="date" />
                   </label>
                 </div>
                 <label class="guest-input">
-                  <span>Guests</span>
+                  <span>{{ language.t('guests') }}</span>
                   <input formControlName="guests" type="number" min="1" [max]="stay.max_guests" />
                 </label>
                 <button type="submit" class="book-btn" [disabled]="bookingForm.invalid || isSubmittingBooking()">
-                  {{ isSubmittingBooking() ? 'Reserving...' : 'Reserve' }}
+                  {{ isSubmittingBooking() ? language.t('reserving') : language.t('reserve') }}
                 </button>
-                <p class="charge-notice">You won't be charged yet</p>
+                <p class="charge-notice">{{ language.t('wonChargeYet') }}</p>
               </form>
+
+              <div class="payment-control">
+                <button type="button" class="btn-outline payment-toggle" (click)="togglePaymentOptions()">
+                  <span class="material-symbols-outlined">payment</span>
+                  {{ language.t('paymentMode') }}
+                  <span class="material-symbols-outlined">{{ showPaymentOptions() ? 'expand_less' : 'expand_more' }}</span>
+                </button>
+                <p class="payment-hint">
+                  {{ paymentConfirmed() ? language.t('paymentModeSelected') + ' ' + paymentLabel(paymentForm.value.method || 'card') + ' — ' + language.t('paymentOptionHint') : language.t('paymentOptionHint') }}
+                </p>
+              </div>
+
+              @if (showPaymentOptions()) {
+                <section class="payment-panel" [formGroup]="paymentForm">
+                  <div class="payment-panel-header">
+                    <div>
+                      <strong>{{ language.t('addPaymentMethod') }}</strong>
+                      <p>{{ language.t('paymentPanelDescription') }}</p>
+                    </div>
+                    <button type="button" class="btn-plain" (click)="showPaymentOptions.set(false)">{{ language.t('close') }}</button>
+                  </div>
+
+                  <div class="payment-method-grid">
+                    <button type="button" [class.active]="selectedPaymentMethod() === 'card'" (click)="selectPaymentMethod('card')">
+                      {{ language.t('paymentCardLabel') }}
+                    </button>
+                    <button type="button" [class.active]="selectedPaymentMethod() === 'paypal'" (click)="selectPaymentMethod('paypal')">
+                      PayPal
+                    </button>
+                    <button type="button" [class.active]="selectedPaymentMethod() === 'googlepay'" (click)="selectPaymentMethod('googlepay')">
+                      Google Pay
+                    </button>
+                  </div>
+
+                  @if (selectedPaymentMethod() === 'card') {
+                    <div class="payment-card-fields">
+                      <label>
+                        <span>{{ language.t('paymentCardLabel') }}</span>
+                        <input type="text" formControlName="cardNumber" placeholder="{{ language.t('cardNumber') }}" />
+                      </label>
+                      <div class="payment-row">
+                        <label>
+                          <span>{{ language.t('expiry') }}</span>
+                          <input type="text" formControlName="expiry" placeholder="MM/YY" />
+                        </label>
+                        <label>
+                          <span>{{ language.t('cvc') }}</span>
+                          <input type="text" formControlName="cvc" placeholder="CVC" />
+                        </label>
+                      </div>
+                      <label>
+                        <span>{{ language.t('postalCode') }}</span>
+                        <input type="text" formControlName="postalCode" placeholder="75001" />
+                      </label>
+                      <label>
+                        <span>{{ language.t('countryRegion') }}</span>
+                        <select formControlName="country">
+                          <option>France</option>
+                          <option>Cameroon</option>
+                          <option>United States</option>
+                        </select>
+                      </label>
+                    </div>
+                  } @else if (selectedPaymentMethod() === 'paypal') {
+                    <div class="payment-method-note">
+                      <p>{{ language.t('paymentNotePaypal') }}</p>
+                    </div>
+                  } @else if (selectedPaymentMethod() === 'googlepay') {
+                    <div class="payment-method-note">
+                      <p>{{ language.t('paymentNoteGooglePay') }}</p>
+                    </div>
+                  }
+
+                  <button type="button" class="btn-outline payment-confirm-btn" (click)="confirmPaymentMode()">
+                    {{ language.t('next') }}
+                  </button>
+                </section>
+              }
 
               <div class="price-breakdown">
                 <div class="line-item">
-                  <span>{{ stay.price_per_night | currency:'XAF' }} x {{ calculateNights() }} nights</span>
+                  <span>{{ stay.price_per_night | currency:'XAF' }} x {{ calculateNights() }} {{ calculateNights() > 1 ? language.t('night') + 's' : language.t('night') }}</span>
                   <span>{{ calculateTotal() | currency:'XAF' }}</span>
                 </div>
                 <div class="line-item">
-                  <span>Cleaning fee</span>
+                  <span>{{ language.t('cleaningFee') }}</span>
                   <span>{{ stay.cleaning_fee | currency:'XAF' }}</span>
                 </div>
                 <div class="line-item">
-                  <span>Service fee</span>
+                  <span>{{ language.t('serviceFee') }}</span>
                   <span>{{ (calculateTotal() * 0.14) | currency:'XAF' }}</span>
                 </div>
                 <hr />
                 <div class="total-item">
-                  <span>Total</span>
+                  <span>{{ language.t('total') }}</span>
                   <span>{{ (calculateTotal() + Number(stay.cleaning_fee || 0) + (calculateTotal() * 0.14)) | currency:'XAF' }}</span>
                 </div>
               </div>
@@ -250,7 +334,7 @@ import { AuthService } from '../../core/auth.service';
             <div class="report-listing">
               <button>
                 <span class="material-symbols-outlined">flag</span>
-                Report this listing
+                {{ language.t('reportListing') }}
               </button>
             </div>
           </aside>
@@ -259,7 +343,7 @@ import { AuthService } from '../../core/auth.service';
     } @else {
       <div class="loading-state">
         <div class="spinner"></div>
-        <p>Finding your dream stay...</p>
+        <p>{{ language.t('findingDreamStay') }}</p>
       </div>
     }
 
@@ -437,6 +521,31 @@ import { AuthService } from '../../core/auth.service';
     .book-btn:hover { background: var(--primary-dark); }
     .charge-notice { text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 12px; }
 
+    .payment-control { display: grid; gap: 10px; margin: 24px 0 16px; }
+    .payment-toggle { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 14px; border: 1px solid var(--border); background: #fff; color: var(--text-main); font-weight: 800; cursor: pointer; }
+    .payment-toggle .material-symbols-outlined { font-size: 18px; }
+    .payment-hint { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
+
+    .payment-panel { background: #fbf6f5; border: 1px solid #f0d0d2; border-radius: 20px; padding: 20px; display: grid; gap: 18px; }
+    .payment-panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+    .payment-panel-header strong { display: block; font-size: 1rem; margin-bottom: 6px; }
+    .payment-panel-header p { color: var(--text-muted); margin: 0; }
+    .btn-plain { background: transparent; border: 0; color: var(--text-main); font-weight: 700; cursor: pointer; }
+
+    .payment-method-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .payment-method-grid button { background: #fff; border: 1px solid #ddd; border-radius: 14px; padding: 14px 12px; cursor: pointer; font-weight: 700; transition: border-color 0.2s, transform 0.2s; }
+    .payment-method-grid button:hover { transform: translateY(-1px); }
+    .payment-method-grid button.active { border-color: var(--primary); color: var(--primary); }
+
+    .payment-card-fields { display: grid; gap: 14px; }
+    .payment-card-fields label { display: grid; gap: 8px; font-weight: 700; color: var(--text-main); }
+    .payment-card-fields input,
+    .payment-card-fields select { border: 1px solid #ccc; border-radius: 12px; padding: 12px 14px; font-size: 0.95rem; width: 100%; }
+    .payment-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .payment-method-note { padding: 16px; background: #fff; border: 1px solid #e5dde0; border-radius: 16px; color: var(--text-muted); }
+    .payment-confirm-btn { justify-self: start; }
+
     .price-breakdown { display: grid; gap: 12px; }
     .line-item { display: flex; justify-content: space-between; color: var(--text-main); font-size: 0.95rem; }
     .total-item { display: flex; justify-content: space-between; font-weight: 800; font-size: 1.1rem; }
@@ -477,6 +586,10 @@ export class PropertyDetailPage {
   protected readonly isSubmittingReview = signal(false);
   protected readonly isSubmittingBooking = signal(false);
   protected readonly isAddingWishlist = signal(false);
+  protected readonly showPaymentOptions = signal(false);
+  protected readonly selectedPaymentMethod = signal('card');
+  protected readonly paymentConfirmed = signal(false);
+  protected readonly language = inject(LanguageService);
   protected readonly Number = Number;
 
   private readonly fallbackImages = [
@@ -499,6 +612,16 @@ export class PropertyDetailPage {
     comment: ['', Validators.required]
   });
 
+  protected readonly paymentForm = this.fb.group({
+    method: ['card'],
+    cardholder: [''],
+    cardNumber: [''],
+    expiry: [''],
+    cvc: [''],
+    postalCode: [''],
+    country: ['France']
+  });
+
   constructor() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.propertiesApi.detail(id).subscribe((property) => {
@@ -506,6 +629,31 @@ export class PropertyDetailPage {
       this.bookingForm.patchValue({ guests: 1 });
     });
     this.loadReviews(id);
+  }
+
+  protected togglePaymentOptions(): void {
+    this.showPaymentOptions.set(!this.showPaymentOptions());
+  }
+
+  protected selectPaymentMethod(method: string): void {
+    this.selectedPaymentMethod.set(method);
+    this.paymentForm.patchValue({ method });
+  }
+
+  protected paymentLabel(method: string): string {
+    switch (method) {
+      case 'paypal': return 'PayPal';
+      case 'googlepay': return 'Google Pay';
+      case 'card':
+      default:
+        return 'Carte de crédit ou de débit';
+    }
+  }
+
+  protected confirmPaymentMode(): void {
+    this.paymentConfirmed.set(true);
+    this.showPaymentOptions.set(false);
+    this.flash(this.language.t('paymentModeSelected'));
   }
 
   calculateNights(): number {
@@ -525,19 +673,19 @@ export class PropertyDetailPage {
 
   book(property: number): void {
     if (!this.auth.isLoggedIn()) {
-      this.flash('Please login to reserve this stay.');
+      this.flash(this.language.t('loginToReserve'));
       this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
       return;
     }
 
     if (this.bookingForm.invalid) {
-      this.flash('Please fill in all booking details correctly.');
+      this.flash(this.language.t('fillDetailsCorrectly'));
       return;
     }
 
     const nights = this.calculateNights();
     if (nights <= 0) {
-      this.flash('Check-out date must be after check-in date.');
+      this.flash(this.language.t('checkOutAfterCheckIn'));
       return;
     }
 
@@ -545,12 +693,12 @@ export class PropertyDetailPage {
     this.bookingsApi.create({ property, ...this.bookingForm.getRawValue() }).subscribe({
       next: (booking) => {
         this.isSubmittingBooking.set(false);
-        this.flash('Reservation successful! Redirecting...');
+        this.flash(this.language.t('bookingSuccessful'));
         setTimeout(() => this.router.navigate(['/booking-confirmation', booking.id]), 1500);
       },
       error: (err) => {
         this.isSubmittingBooking.set(false);
-        const msg = err.error?.non_field_errors?.[0] || 'Could not create booking. Please check availability.';
+        const msg = err.error?.non_field_errors?.[0] || this.language.t('couldNotBook');
         this.flash(msg);
       }
     });
@@ -558,7 +706,7 @@ export class PropertyDetailPage {
 
   review(property: number): void {
     if (!this.auth.isLoggedIn()) {
-      this.flash('Please login to post a review.');
+      this.flash(this.language.t('loginToReview'));
       this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
       return;
     }
@@ -570,14 +718,14 @@ export class PropertyDetailPage {
         this.isSubmittingReview.set(false);
         this.reviewForm.patchValue({ comment: '', rating: 5 });
         this.loadReviews(property);
-        this.flash('Thank you for your review!');
+        this.flash(this.language.t('thankYouReview'));
       },
       error: (err) => {
         this.isSubmittingReview.set(false);
         if (err.status === 400 && err.error?.non_field_errors?.[0]?.includes('unique')) {
-          this.flash('You have already reviewed this property.');
+          this.flash(this.language.t('alreadyReviewed'));
         } else {
-          this.flash('Could not post review. Ensure all fields are filled and you have not reviewed this yet.');
+          this.flash(this.language.t('couldNotPostReview'));
         }
       }
     });
@@ -589,21 +737,21 @@ export class PropertyDetailPage {
     this.wishlistApi.add(property).subscribe({
       next: () => {
         this.isAddingWishlist.set(false);
-        this.flash('Added to your wishlist!');
+        this.flash(this.language.t('addedWishlist'));
       },
       error: (err) => {
         this.isAddingWishlist.set(false);
         if (err.status === 400) {
-          this.flash('Already in your wishlist.');
+          this.flash(this.language.t('alreadyWishlist'));
         } else {
-          this.flash('Could not save. Login may be required.');
+          this.flash(this.language.t('couldNotSave'));
         }
       }
     });
   }
 
   share(): void {
-    this.flash('Link copied to clipboard!');
+    this.flash(this.language.t('linkCopied'));
   }
 
   fallbackImage(index: number): string {

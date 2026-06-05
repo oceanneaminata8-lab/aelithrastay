@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Booking } from '../../core/models';
 import { BookingService } from '../../core/booking.service';
+import { LanguageService } from '../../core/language.service';
 
 @Component({
   selector: 'app-bookings-page',
@@ -10,9 +11,9 @@ import { BookingService } from '../../core/booking.service';
   template: `
     <section class="trips-page">
       <header class="trips-header">
-        <span class="eyebrow">Trips</span>
-        <h1>Upcoming reservations</h1>
-        <p>All your upcoming reservations and travel memories in one place.</p>
+        <span class="eyebrow">{{ language.t('trips') }}</span>
+        <h1>{{ language.t('upcomingReservations') }}</h1>
+        <p>{{ language.t('allUpcomingReservations') }}</p>
       </header>
 
       <section class="trips-section">
@@ -25,14 +26,14 @@ import { BookingService } from '../../core/booking.service';
               </div>
               <div class="trip-details">
                 <div class="trip-meta-v2">
-                  <span class="stay-type">Stay</span>
+                  <span class="stay-type">{{ language.t('stay') }}</span>
                   <span class="dates">{{ booking.check_in | date:'MMM d' }} – {{ booking.check_out | date:'MMM d' }}</span>
                 </div>
                 <h3>{{ booking.property_title }}</h3>
                 <div class="trip-footer-v2">
                   <div class="guests">
                     <span class="material-symbols-outlined">group</span>
-                    {{ booking.guests }} guests
+                    {{ booking.guests }} {{ language.t('guestsCount') }}
                   </div>
                   <div class="price">
                     {{ booking.total_price | currency:'XAF' }}
@@ -43,9 +44,9 @@ import { BookingService } from '../../core/booking.service';
           } @empty {
             <div class="empty-state">
               <span class="material-symbols-outlined">hotel_class</span>
-              <h3>No reservations yet</h3>
-              <p>Book your first stay and it will appear here.</p>
-              <a routerLink="/" class="btn-primary">Start exploring</a>
+              <h3>{{ language.t('noReservationsYet') }}</h3>
+              <p>{{ language.t('bookFirstStay') }}</p>
+              <a routerLink="/" class="btn-primary">{{ language.t('startExploring') }}</a>
             </div>
           }
         </div>
@@ -56,11 +57,11 @@ import { BookingService } from '../../core/booking.service';
       <section class="past-trips-section">
         <div class="section-head-v2">
           <div>
-            <h3>Where you've been</h3>
-            <p>Relive your favorite travel memories</p>
+            <h3>{{ language.t('whereYouveBeen') }}</h3>
+            <p>{{ language.t('reliveMemories') }}</p>
           </div>
           <button type="button" class="btn-view-all" (click)="showNotice()">
-            View all 
+            {{ language.t('viewAll') }} 
             <span class="material-symbols-outlined">history</span>
           </button>
         </div>
@@ -81,10 +82,10 @@ import { BookingService } from '../../core/booking.service';
 
       <section class="help-banner">
         <div>
-          <h3>Can't find your reservation?</h3>
-          <p>If you don't see your trip here, it may have been booked with a different email address.</p>
+          <h3>{{ language.t('cantFindReservation') }}</h3>
+          <p>{{ language.t('cantFindReservationDesc') }}</p>
         </div>
-        <a routerLink="/profile" class="btn-outline-white">Visit Help Center</a>
+        <a routerLink="/profile" class="btn-outline-white">{{ language.t('visitHelpCenter') }}</a>
       </section>
 
       @if (notice()) {
@@ -178,6 +179,7 @@ import { BookingService } from '../../core/booking.service';
 })
 export class BookingsPage {
   private readonly bookingsApi = inject(BookingService);
+  protected readonly language = inject(LanguageService);
   protected readonly bookings = signal<Booking[]>([]);
 
   protected readonly pastTrips = [
@@ -202,7 +204,7 @@ export class BookingsPage {
   }
 
   showNotice(): void {
-    this.notice.set('Historical trips archive is being synchronized.');
+    this.notice.set(this.language.t('historicalTripsSync'));
     window.setTimeout(() => this.notice.set(''), 3000);
   }
 

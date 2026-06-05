@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Booking } from '../../core/models';
 import { BookingService } from '../../core/booking.service';
+import { LanguageService } from '../../core/language.service';
 
 @Component({
   selector: 'app-booking-confirmation-page',
@@ -11,9 +12,9 @@ import { BookingService } from '../../core/booking.service';
     <section class="confirmation-page">
       <header class="confirm-hero">
         <div class="confirm-icon"><span class="material-symbols-outlined">check_circle</span></div>
-        <h1>Your reservation is confirmed!</h1>
-        <p>A confirmation email is on its way to your inbox.</p>
-        <span class="confirm-code">Confirmation Code: {{ code() }}</span>
+        <h1>{{ language.t('reservationConfirmed') }}</h1>
+        <p>{{ language.t('confirmationEmailSent') }}</p>
+        <span class="confirm-code">{{ language.t('confirmationCode') }}: {{ code() }}</span>
       </header>
 
       @if (booking(); as item) {
@@ -21,14 +22,14 @@ import { BookingService } from '../../core/booking.service';
           <section class="confirm-property">
             <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=85" [alt]="item.property_title" />
             <div>
-              <span class="eyebrow">AelithraStay reservation</span>
+              <span class="eyebrow">AelithraStay {{ language.t('reservation') }}</span>
               <h2>{{ item.property_title }}</h2>
-              <p class="muted">Hosted stay · {{ item.status }}</p>
+              <p class="muted">{{ language.t('hostedStay') }} · {{ item.status }}</p>
               <div class="host-mini">
                 <span class="material-symbols-outlined">account_circle</span>
                 <div>
-                  <strong>Your host is ready</strong>
-                  <p>Check-in details will be shared before arrival.</p>
+                  <strong>{{ language.t('hostIsReady') }}</strong>
+                  <p>{{ language.t('checkInDetails') }}</p>
                 </div>
               </div>
             </div>
@@ -36,31 +37,31 @@ import { BookingService } from '../../core/booking.service';
 
           <section class="confirm-summary">
             <div>
-              <h3>Reservation Details</h3>
+              <h3>{{ language.t('reservationDetails') }}</h3>
               <p><span class="material-symbols-outlined">calendar_today</span>{{ item.check_in | date:'mediumDate' }} to {{ item.check_out | date:'mediumDate' }}</p>
-              <p><span class="material-symbols-outlined">group</span>{{ item.guests }} guests · {{ item.nights }} nights</p>
+              <p><span class="material-symbols-outlined">group</span>{{ item.guests }} {{ language.t('guestsCount') }} · {{ item.nights }} {{ language.t('night') }}{{ item.nights > 1 ? 's' : '' }}</p>
             </div>
             <div>
-              <h3>Price Breakdown</h3>
-              <div class="price-line"><span>Stay total</span><strong>{{ item.total_price | currency:'XAF' }}</strong></div>
+              <h3>{{ language.t('priceBreakdown') }}</h3>
+              <div class="price-line"><span>{{ language.t('stayTotal') }}</span><strong>{{ item.total_price | currency:'XAF' }}</strong></div>
               <div class="price-line"><span>Status</span><strong>{{ item.status }}</strong></div>
             </div>
           </section>
 
           <footer class="confirm-actions">
-            <a routerLink="/bookings"><span class="material-symbols-outlined">flight_takeoff</span>View Trips</a>
-            <a routerLink="/profile"><span class="material-symbols-outlined">chat_bubble</span>Contact Host</a>
-            <button type="button" (click)="print()"><span class="material-symbols-outlined">picture_as_pdf</span>Print PDF</button>
+            <a routerLink="/bookings"><span class="material-symbols-outlined">flight_takeoff</span>{{ language.t('viewTrips') }}</a>
+            <a routerLink="/profile"><span class="material-symbols-outlined">chat_bubble</span>{{ language.t('contactHost') }}</a>
+            <button type="button" (click)="print()"><span class="material-symbols-outlined">picture_as_pdf</span>{{ language.t('printPdf') }}</button>
           </footer>
         </article>
       } @else {
-        <p class="notice">Loading confirmation...</p>
+        <p class="notice">{{ language.t('loadingConfirmation') }}</p>
       }
 
       <section class="help-card-grid">
-        <article><span class="material-symbols-outlined">location_on</span><h3>Getting there</h3><p>Check your email for map and arrival instructions.</p></article>
-        <article><span class="material-symbols-outlined">policy</span><h3>Cancellation policy</h3><p>Review your trip policies before making changes.</p></article>
-        <article><span class="material-symbols-outlined">help</span><h3>Need help?</h3><p>Reach out to support from your profile anytime.</p></article>
+        <article><span class="material-symbols-outlined">location_on</span><h3>{{ language.t('gettingThere') }}</h3><p>{{ language.t('arrivalInstructions') }}</p></article>
+        <article><span class="material-symbols-outlined">policy</span><h3>{{ language.t('cancellationPolicy') }}</h3><p>{{ language.t('reviewTripPolicies') }}</p></article>
+        <article><span class="material-symbols-outlined">help</span><h3>{{ language.t('needHelp') }}</h3><p>{{ language.t('reachSupport') }}</p></article>
       </section>
     </section>
   `
@@ -68,6 +69,7 @@ import { BookingService } from '../../core/booking.service';
 export class BookingConfirmationPage {
   private readonly route = inject(ActivatedRoute);
   private readonly bookingsApi = inject(BookingService);
+  protected readonly language = inject(LanguageService);
 
   protected readonly booking = signal<Booking | null>(null);
   protected readonly code = signal('AEL-' + Math.random().toString(36).slice(2, 10).toUpperCase());

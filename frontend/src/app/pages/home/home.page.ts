@@ -4,11 +4,13 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PropertyService } from '../../core/property.service';
 import { Property } from '../../core/models';
+import { LanguageService } from '../../core/language.service';
 
 type FilterMap = Partial<Record<'city' | 'country' | 'guests' | 'property_type' | 'min_price' | 'ordering', string>>;
 
 interface LandingCategory {
   label: string;
+  translationKey: string;
   icon: string;
   filters: FilterMap;
 }
@@ -32,27 +34,27 @@ interface InspirationStay {
         <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1800&q=85" alt="Modern villa with pool at sunset" />
       </div>
       <div class="stay-hero-content">
-        <h1>Find your next <span class="highlight">unforgettable</span> stay</h1>
-        <p>Discover unique homes, luxury villas, and cozy cabins around the world.</p>
+        <h1>{{ language.t('findNextStay') }} <span class="highlight">{{ language.t('unforgettable') }}</span></h1>
+        <p>{{ language.t('discoverUnique') }}</p>
         
         <form class="stay-search" [formGroup]="filters" (ngSubmit)="load()">
           <div class="search-input-group">
             <label>
-              <span>Location</span>
-              <input formControlName="city" placeholder="Where are you going?" />
+              <span>{{ language.t('location') }}</span>
+              <input formControlName="city" [placeholder]="language.t('whereGoing')" />
             </label>
             <label>
-              <span>Country</span>
-              <input formControlName="country" placeholder="Add country" />
+              <span>{{ language.t('country') }}</span>
+              <input formControlName="country" [placeholder]="language.t('addCountry')" />
             </label>
             <label>
-              <span>Guests</span>
-              <input formControlName="guests" type="number" min="1" placeholder="Add guests" />
+              <span>{{ language.t('guests') }}</span>
+              <input formControlName="guests" type="number" min="1" [placeholder]="language.t('addGuests')" />
             </label>
           </div>
           <button type="submit" aria-label="Search" class="search-btn">
             <span class="material-symbols-outlined">search</span>
-            <span>Search</span>
+            <span>{{ language.t('search') }}</span>
           </button>
         </form>
       </div>
@@ -67,7 +69,7 @@ interface InspirationStay {
             (click)="selectCategory(category)"
           >
             <span class="material-symbols-outlined">{{ category.icon }}</span>
-            <span class="label">{{ category.label }}</span>
+            <span class="label">{{ language.t(category.translationKey) }}</span>
           </button>
         }
       </div>
@@ -77,8 +79,8 @@ interface InspirationStay {
       <section class="stays-section">
         <div class="section-head">
           <div>
-            <span class="eyebrow">Explore</span>
-            <h2>{{ activeCategory() }}</h2>
+            <span class="eyebrow">{{ language.t('explore') }}</span>
+            <h2>{{ language.t(activeCategoryTranslationKey()) }}</h2>
           </div>
           <div class="section-actions">
             @if (loading()) {
@@ -115,14 +117,14 @@ interface InspirationStay {
                   <h3>{{ property.title }}</h3>
                   <div class="rating">
                     <span class="material-symbols-outlined">star</span>
-                    <span>{{ property.average_rating || 'New' }}</span>
+                    <span>{{ property.average_rating || language.t('new') }}</span>
                   </div>
                 </div>
                 <p class="location">{{ property.city }}, {{ property.country }}</p>
                 <p class="amenity-summary">{{ property.max_guests }} guests &middot; {{ property.bedrooms }} bedrooms &middot; {{ property.beds }} beds</p>
                 <div class="price-row">
                   <span class="price">{{ property.price_per_night | currency:'XAF':'symbol':'1.0-0' }}</span>
-                  <span class="unit">/ night</span>
+                  <span class="unit">/ {{ language.t('night') }}</span>
                 </div>
               </div>
             </a>
@@ -130,9 +132,9 @@ interface InspirationStay {
             @if (!loading()) {
               <div class="empty-state">
                 <span class="material-symbols-outlined">search_off</span>
-                <h3>No properties found</h3>
-                <p>Try adjusting your filters to find what you're looking for.</p>
-                <button type="button" (click)="resetFilters()">Clear all filters</button>
+                <h3>{{ language.t('noPropertiesFound') }}</h3>
+                <p>{{ language.t('tryAdjustingFilters') }}</p>
+                <button type="button" (click)="resetFilters()">{{ language.t('clearAllFilters') }}</button>
               </div>
             }
           }
@@ -141,11 +143,11 @@ interface InspirationStay {
 
       <section class="feature-banner" aria-label="Stay of the week">
         <div class="banner-content">
-          <span class="tag">Stay of the week</span>
+          <span class="tag">{{ language.t('stayOfWeek') }}</span>
           <h2>Highland Heritage Castle</h2>
           <p>Experience a night of royalty in a restored stronghold where luxury meets history in every stone. A truly unique escape for those seeking something extraordinary.</p>
           <button type="button" (click)="exploreCastle()">
-            View Details 
+            {{ language.t('viewDetails') }} 
             <span class="material-symbols-outlined">arrow_forward</span>
           </button>
         </div>
@@ -153,16 +155,16 @@ interface InspirationStay {
 
       <section class="host-invitation">
         <div class="invitation-text">
-          <h2>Become a Host and unlock a world of possibilities</h2>
-          <p>Share your home and connect with travelers from across the globe. AelithraStay gives you the tools to welcome guests with confidence and earn extra income.</p>
-          <a routerLink="/host" class="btn-primary">Get Started</a>
+          <h2>{{ language.t('becomeHost') }}</h2>
+          <p>{{ language.t('shareHome') }}</p>
+          <a routerLink="/host" class="btn-primary">{{ language.t('getStarted') }}</a>
         </div>
         <div class="invitation-visual">
           <div class="image-wrapper">
             <img src="https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1200&q=85" alt="Hosts preparing a welcoming kitchen" />
             <div class="testimonial-card">
               <span class="quote">"</span>
-              <p>Hosting changed our lives. We've met amazing people from every corner of the world."</p>
+              <p>{{ language.t('hostingChangedLife') }}</p>
               <strong>Oceanne and Lauren , Superhosts</strong>
             </div>
           </div>
@@ -747,22 +749,26 @@ interface InspirationStay {
 export class HomePage {
   private readonly fb = inject(FormBuilder);
   private readonly propertiesApi = inject(PropertyService);
+  protected readonly language = inject(LanguageService);
 
   protected readonly properties = signal<Property[]>([]);
   protected readonly loading = signal(false);
   protected readonly error = signal('');
   protected readonly activeCategory = signal('Amazing pools');
+  protected readonly activeCategoryTranslationKey = computed(() => {
+    return this.categories.find(c => c.label === this.activeCategory())?.translationKey || 'explore';
+  });
   protected readonly visibleProperties = computed(() => this.properties());
 
   protected readonly categories: LandingCategory[] = [
-    { label: 'Amazing pools', icon: 'pool', filters: {} },
-    { label: 'Beachfront', icon: 'beach_access', filters: { country: 'Greece' } },
-    { label: 'Cabins', icon: 'cabin', filters: { property_type: 'cabin' } },
-    { label: 'Luxe', icon: 'diamond', filters: { min_price: '300' } },
-    { label: 'Trending', icon: 'trending_up', filters: { ordering: '-created_at' } },
-    { label: 'Countryside', icon: 'landscape', filters: { property_type: 'house' } },
-    { label: 'Castles', icon: 'castle', filters: { property_type: 'villa' } },
-    { label: 'Top cities', icon: 'apartment', filters: { property_type: 'apartment' } }
+    { label: 'Amazing pools', translationKey: 'amazingPools', icon: 'pool', filters: {} },
+    { label: 'Beachfront', translationKey: 'beachfront', icon: 'beach_access', filters: { country: 'Greece' } },
+    { label: 'Cabins', translationKey: 'cabins', icon: 'cabin', filters: { property_type: 'cabin' } },
+    { label: 'Luxe', translationKey: 'luxe', icon: 'diamond', filters: { min_price: '300' } },
+    { label: 'Trending', translationKey: 'trending', icon: 'trending_up', filters: { ordering: '-created_at' } },
+    { label: 'Countryside', translationKey: 'countryside', icon: 'landscape', filters: { property_type: 'house' } },
+    { label: 'Castles', translationKey: 'castles', icon: 'castle', filters: { property_type: 'villa' } },
+    { label: 'Top cities', translationKey: 'topCities', icon: 'apartment', filters: { property_type: 'apartment' } }
   ];
 
   protected readonly filters = this.fb.nonNullable.group({

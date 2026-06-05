@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
+import { LanguageService } from '../../core/language.service';
 
 @Component({
   selector: 'app-register-page',
@@ -49,37 +50,37 @@ import { AuthService } from '../../core/auth.service';
       </div>
       <div class="auth-card register-card">
         <div class="register-head">
-          <h1>Create an account</h1>
-          <p>Join AelithraStay to find your next stay or start hosting.</p>
+          <h1>{{ language.t('createAccount') }}</h1>
+          <p>{{ language.t('registerSubtitle') }}</p>
         </div>
 
         <form [formGroup]="form" (ngSubmit)="submit()">
           <label>
-            Username
+            {{ language.t('username') }}
             <input formControlName="username" placeholder="john_doe" />
-            <small class="field-hint">Use letters, numbers, @, ., +, -, or _. No spaces.</small>
+            <small class="field-hint">{{ language.t('usernameHint') }}</small>
           </label>
-          <label>Email<input formControlName="email" type="email" placeholder="name@example.com" /></label>
+          <label>{{ language.t('email') }}<input formControlName="email" type="email" placeholder="name@example.com" /></label>
           <div class="form-grid">
-            <label>First name<input formControlName="first_name" placeholder="John" /></label>
-            <label>Last name<input formControlName="last_name" placeholder="Doe" /></label>
+            <label>{{ language.t('firstName') }}<input formControlName="first_name" placeholder="John" /></label>
+            <label>{{ language.t('lastName') }}<input formControlName="last_name" placeholder="Doe" /></label>
           </div>
-          <label>Password<input formControlName="password" type="password" placeholder="********" /></label>
+          <label>{{ language.t('password') }}<input formControlName="password" type="password" placeholder="********" /></label>
           <label class="host-toggle">
             <span>
-              <strong>I want to host</strong>
-              <small>List your space and earn extra income.</small>
+              <strong>{{ language.t('hostToggleLabel') }}</strong>
+              <small>{{ language.t('hostToggleNote') }}</small>
             </span>
             <select formControlName="role">
               <option value="guest">Guest</option>
               <option value="host">Host</option>
             </select>
           </label>
-          <p class="terms">By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+          <p class="terms">{{ language.t('termsAgreement') }}</p>
           @if (error()) {
             <p class="notice">{{ error() }}</p>
           }
-          <button type="submit" [disabled]="form.invalid || loading()">{{ loading() ? 'Creating...' : 'Sign Up' }}</button>
+          <button type="submit" [disabled]="form.invalid || loading()">{{ loading() ? language.t('creating') : language.t('signUp') }}</button>
         </form>
 
         <div class="divider"><span>or</span></div>
@@ -106,7 +107,7 @@ import { AuthService } from '../../core/auth.service';
           </button>
         </div>
 
-        <p class="auth-switch">Already have an account? <a routerLink="/login">Log in</a></p>
+        <p class="auth-switch">{{ language.t('alreadyHaveAccount') }} <a routerLink="/login">{{ language.t('logInLink') }}</a></p>
       </div>
     </section>
 
@@ -119,6 +120,7 @@ export class RegisterPage {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  protected readonly language = inject(LanguageService);
 
   protected readonly loading = signal(false);
   protected readonly error = signal('');

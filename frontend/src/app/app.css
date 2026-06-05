@@ -51,7 +51,34 @@
 .account {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+}
+
+.translate-btn {
+  background: #f6f3f2;
+  color: #ba0036;
+  border: 1.5px solid #ba0036;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px rgba(186, 0, 54, 0.1);
+}
+
+.translate-btn:hover {
+  background: #ba0036;
+  color: #ffffff;
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: 0 6px 12px rgba(186, 0, 54, 0.2);
+}
+
+.translate-btn .material-symbols-outlined {
+  font-size: 1.2rem;
 }
 
 .account a {

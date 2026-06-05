@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
+import { LanguageService } from '../../core/language.service';
 
 @Component({
   selector: 'app-admin-login-page',
@@ -51,31 +52,31 @@ import { AuthService } from '../../core/auth.service';
           <div class="auth-mark admin-mark">
             <span class="material-symbols-outlined">admin_panel_settings</span>
           </div>
-          <h1>Admin Portal</h1>
-          <p>Secure access for administrators only</p>
+          <h1>{{ language.t('adminPortal') }}</h1>
+          <p>{{ language.t('adminSubtitle') }}</p>
         </div>
 
         <form [formGroup]="form" (ngSubmit)="submit()">
-          <label>Admin Email<input formControlName="email" type="email" placeholder="admin@aelithrastay.com" /></label>
+          <label>{{ language.t('adminEmail') }}<input formControlName="email" type="email" placeholder="admin@aelithrastay.com" /></label>
           <label>
-            <span class="label-row">Password</span>
-            <input formControlName="password" type="password" placeholder="Enter admin password" />
+            <span class="label-row">{{ language.t('password') }}</span>
+            <input formControlName="password" type="password" placeholder="{{ language.t('password') }}" />
           </label>
           <label class="check-row">
             <input type="checkbox" formControlName="rememberMe" />
-            <span>Remember this device</span>
+            <span>{{ language.t('rememberDevice') }}</span>
           </label>
           @if (error()) {
             <p class="notice error">{{ error() }}</p>
           }
           <button type="submit" [disabled]="form.invalid || loading()">
-            {{ loading() ? 'Authenticating...' : 'Enter Admin Panel' }}
+            {{ loading() ? language.t('authenticating') : language.t('enterAdminPanel') }}
           </button>
         </form>
 
         <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--admin-border); text-align: center;">
           <p style="font-size: 0.9rem; color: var(--admin-muted);">
-            Not an admin? <a routerLink="/login" style="color: var(--admin-primary); text-decoration: none; font-weight: 600;">Back to Login</a>
+            {{ language.t('notAnAdmin') }} <a routerLink="/login" style="color: var(--admin-primary); text-decoration: none; font-weight: 600;">{{ language.t('backToLogin') }}</a>
           </p>
         </div>
       </div>
@@ -119,6 +120,7 @@ export class AdminLoginPage {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  protected readonly language = inject(LanguageService);
 
   protected readonly loading = signal(false);
   protected readonly error = signal('');

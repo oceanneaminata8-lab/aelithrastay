@@ -6,6 +6,7 @@ import { BookingService } from '../../core/booking.service';
 import { PropertyService } from '../../core/property.service';
 import { UserService } from '../../core/user.service';
 import { AdminService, Dispute, ReviewModeration, PropertyModeration, AdminUser } from '../../core/admin.service';
+import { LanguageService } from '../../core/language.service';
 
 type AdminPanel = 'dashboard' | 'properties' | 'reservations' | 'users' | 'analytics' | 'locations' | 'disputes' | 'reviews' | 'property-approval' | 'notifications';
 
@@ -17,21 +18,21 @@ type AdminPanel = 'dashboard' | 'properties' | 'reservations' | 'users' | 'analy
     <section class="admin-layout">
       <aside class="admin-sidebar">
         <div>
-          <h1>AelithraStay Admin</h1>
-          <p>Management Portal</p>
+          <h1>{{ language.t('adminPortalTitle') }}</h1>
+          <p>{{ language.t('managementPortal') }}</p>
         </div>
         <nav>
-          <button type="button" [class.active]="activePanel() === 'dashboard'" (click)="switchPanel('dashboard')"><span class="material-symbols-outlined">dashboard</span>Dashboard</button>
-          <button type="button" [class.active]="activePanel() === 'properties'" (click)="switchPanel('properties')"><span class="material-symbols-outlined">home_work</span>Property Listings</button>
-          <button type="button" [class.active]="activePanel() === 'property-approval'" (click)="switchPanel('property-approval')"><span class="material-symbols-outlined">fact_check</span>Property Approval</button>
-          <button type="button" [class.active]="activePanel() === 'reservations'" (click)="switchPanel('reservations')"><span class="material-symbols-outlined">calendar_month</span>Reservations</button>
-          <button type="button" [class.active]="activePanel() === 'disputes'" (click)="switchPanel('disputes')"><span class="material-symbols-outlined">gavel</span>Disputes</button>
-          <button type="button" [class.active]="activePanel() === 'reviews'" (click)="switchPanel('reviews')"><span class="material-symbols-outlined">rate_review</span>Review Moderation</button>
-          <button type="button" [class.active]="activePanel() === 'users'" (click)="switchPanel('users')"><span class="material-symbols-outlined">group</span>User Management</button>
-          <button type="button" [class.active]="activePanel() === 'notifications'" (click)="switchPanel('notifications')"><span class="material-symbols-outlined">notifications</span>Notifications</button>
-          <button type="button" [class.active]="activePanel() === 'analytics'" (click)="switchPanel('analytics')"><span class="material-symbols-outlined">analytics</span>Analytics</button>
+          <button type="button" [class.active]="activePanel() === 'dashboard'" (click)="switchPanel('dashboard')"><span class="material-symbols-outlined">dashboard</span>{{ language.t('admin') }}</button>
+          <button type="button" [class.active]="activePanel() === 'properties'" (click)="switchPanel('properties')"><span class="material-symbols-outlined">home_work</span>{{ language.t('propertyListings') }}</button>
+          <button type="button" [class.active]="activePanel() === 'property-approval'" (click)="switchPanel('property-approval')"><span class="material-symbols-outlined">fact_check</span>{{ language.t('propertyApproval') }}</button>
+          <button type="button" [class.active]="activePanel() === 'reservations'" (click)="switchPanel('reservations')"><span class="material-symbols-outlined">calendar_month</span>{{ language.t('reservations') }}</button>
+          <button type="button" [class.active]="activePanel() === 'disputes'" (click)="switchPanel('disputes')"><span class="material-symbols-outlined">gavel</span>{{ language.t('disputesTitle') }}</button>
+          <button type="button" [class.active]="activePanel() === 'reviews'" (click)="switchPanel('reviews')"><span class="material-symbols-outlined">rate_review</span>{{ language.t('reviewModeration') }}</button>
+          <button type="button" [class.active]="activePanel() === 'users'" (click)="switchPanel('users')"><span class="material-symbols-outlined">group</span>{{ language.t('userManagement') }}</button>
+          <button type="button" [class.active]="activePanel() === 'notifications'" (click)="switchPanel('notifications')"><span class="material-symbols-outlined">notifications</span>{{ language.t('notificationsTitle') }}</button>
+          <button type="button" [class.active]="activePanel() === 'analytics'" (click)="switchPanel('analytics')"><span class="material-symbols-outlined">analytics</span>{{ language.t('analyticsTitle') }}</button>
         </nav>
-        <a class="admin-add" routerLink="/host">Add New Listing</a>
+        <a class="admin-add" routerLink="/host">{{ language.t('addNewListing') }}</a>
       </aside>
 
       <main class="admin-main">
@@ -43,13 +44,13 @@ type AdminPanel = 'dashboard' | 'properties' | 'reservations' | 'users' | 'analy
           <div class="actions">
             <label class="admin-search">
               <span class="material-symbols-outlined">search</span>
-              <input placeholder="Search records..." (input)="search.set(inputValue($event))" />
+              <input [placeholder]="language.t('searchRecords')" (input)="search.set(inputValue($event))" />
             </label>
             <button type="button" (click)="exportReport()">
-              <span class="material-symbols-outlined">download</span> Export
+              <span class="material-symbols-outlined">download</span> {{ language.t('export') }}
             </button>
             <a routerLink="/host">
-              <span class="material-symbols-outlined">add</span> Listing
+              <span class="material-symbols-outlined">add</span> {{ language.t('listing') }}
             </a>
           </div>
         </header>
@@ -61,25 +62,25 @@ type AdminPanel = 'dashboard' | 'properties' | 'reservations' | 'users' | 'analy
         <section class="admin-stats">
           <button type="button" (click)="switchPanel('users')">
             <span class="material-symbols-outlined">group</span>
-            <p>Total Users</p>
+            <p>{{ language.t('totalUsers') }}</p>
             <strong>{{ users().length }}</strong>
             <em>+{{ (users().length * 0.1) | number:'1.0-0' }}</em>
           </button>
           <button type="button" (click)="switchPanel('properties')">
             <span class="material-symbols-outlined">apartment</span>
-            <p>Active Listings</p>
+            <p>{{ language.t('activeListings') }}</p>
             <strong>{{ properties().length }}</strong>
-            <em>Active</em>
+            <em>{{ language.t('new') }}</em>
           </button>
           <button type="button" (click)="switchPanel('reservations')">
             <span class="material-symbols-outlined">book_online</span>
-            <p>Reservations</p>
+            <p>{{ language.t('reservations') }}</p>
             <strong>{{ bookings().length }}</strong>
             <em>Live</em>
           </button>
           <button type="button" (click)="switchPanel('analytics')">
             <span class="material-symbols-outlined">payments</span>
-            <p>Revenue</p>
+            <p>{{ language.t('revenueTitle') }}</p>
             <strong>{{ revenue() | currency:'XAF':'symbol':'1.0-0' }}</strong>
             <em>+18%</em>
           </button>
@@ -1004,6 +1005,7 @@ export class AdminDashboardPage {
   private readonly userApi = inject(UserService);
   private readonly adminApi = inject(AdminService);
   private readonly router = inject(Router);
+  protected readonly language = inject(LanguageService);
 
   protected readonly bookings = signal<Booking[]>([]);
   protected readonly properties = signal<Property[]>([]);

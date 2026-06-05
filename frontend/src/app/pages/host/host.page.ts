@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Property } from '../../core/models';
 import { PropertyService } from '../../core/property.service';
+import { LanguageService } from '../../core/language.service';
 
 @Component({
   selector: 'app-host-page',
@@ -12,14 +13,14 @@ import { PropertyService } from '../../core/property.service';
       <header class="studio-header">
         <div class="header-content">
           <div>
-            <span class="studio-badge">Host Studio</span>
-            <h1>Manage your <span class="highlight">empire</span></h1>
-            <p>Welcome back! Here's where you turn your space into someone's next memory.</p>
+            <span class="studio-badge">{{ language.t('hostStudio') }}</span>
+            <h1>{{ language.t('manageEmpire').split(' ')[0] }} {{ language.t('manageEmpire').split(' ')[1] }} <span class="highlight">{{ language.t('manageEmpire').split(' ')[2] }}</span></h1>
+            <p>{{ language.t('manageEmpireDesc') }}</p>
           </div>
           <div class="studio-stats">
             <div class="stat-pill">
               <strong>{{ properties().length }}</strong>
-              <span>Active Listings</span>
+              <span>{{ language.t('activeListings') }}</span>
             </div>
           </div>
         </div>
@@ -31,27 +32,27 @@ import { PropertyService } from '../../core/property.service';
             <div class="card-header">
               <span class="material-symbols-outlined icon-bg">add_home</span>
               <div>
-                <h2>Create new listing</h2>
-                <p>Provide details to attract guests from around the world.</p>
+                <h2>{{ language.t('createNewListing') }}</h2>
+                <p>{{ language.t('provideDetails') }}</p>
               </div>
             </div>
 
             <form [formGroup]="form" (ngSubmit)="create()" class="modern-form">
               <div class="form-section">
-                <h3>Basic Information</h3>
+                <h3>{{ language.t('basicInformation') }}</h3>
                 <label class="floating-label">
-                  <span>Listing Title</span>
-                  <input formControlName="title" placeholder="e.g. Modern Minimalist Beachfront Villa" />
+                  <span>{{ language.t('listingTitle') }}</span>
+                  <input formControlName="title" [placeholder]="language.t('listingTitlePlaceholder')" />
                 </label>
                 <label class="floating-label">
-                  <span>Description</span>
-                  <textarea formControlName="description" placeholder="Tell guests what makes your place unique..."></textarea>
+                  <span>{{ language.t('bio') }}</span>
+                  <textarea formControlName="description" [placeholder]="language.t('descriptionPlaceholder')"></textarea>
                 </label>
               </div>
 
               <div class="form-grid">
                 <label class="floating-label">
-                  <span>Property Type</span>
+                  <span>{{ language.t('propertyType') }}</span>
                   <select formControlName="property_type">
                     <option value="apartment">Apartment</option>
                     <option value="house">House</option>
@@ -62,7 +63,7 @@ import { PropertyService } from '../../core/property.service';
                   </select>
                 </label>
                 <label class="floating-label">
-                  <span>Price per night</span>
+                  <span>{{ language.t('pricePerNight') }}</span>
                   <div class="input-with-prefix">
                     <span class="prefix">FCFA</span>
                     <input formControlName="price_per_night" type="number" min="1" />
@@ -71,40 +72,40 @@ import { PropertyService } from '../../core/property.service';
               </div>
 
               <div class="form-section">
-                <h3>Location</h3>
+                <h3>{{ language.t('location') }}</h3>
                 <label class="floating-label">
-                  <span>Address</span>
-                  <input formControlName="address" placeholder="123 Ocean Drive" />
+                  <span>{{ language.t('address') }}</span>
+                  <input formControlName="address" [placeholder]="language.t('addressPlaceholder')" />
                 </label>
                 <div class="form-grid">
                   <label class="floating-label">
-                    <span>City</span>
-                    <input formControlName="city" placeholder="e.g. Malibu" />
+                    <span>{{ language.t('city') }}</span>
+                    <input formControlName="city" [placeholder]="language.t('cityPlaceholder')" />
                   </label>
                   <label class="floating-label">
-                    <span>Country</span>
-                    <input formControlName="country" placeholder="e.g. USA" />
+                    <span>{{ language.t('country') }}</span>
+                    <input formControlName="country" [placeholder]="language.t('countryPlaceholder')" />
                   </label>
                 </div>
               </div>
 
               <div class="form-section">
-                <h3>Layout & Capacity</h3>
+                <h3>{{ language.t('layoutCapacity') }}</h3>
                 <div class="form-row-multi">
                   <label class="counter-input">
-                    <span>Guests</span>
+                    <span>{{ language.t('guests') }}</span>
                     <input formControlName="max_guests" type="number" min="1" />
                   </label>
                   <label class="counter-input">
-                    <span>Bedrooms</span>
+                    <span>{{ language.t('bedrooms') }}</span>
                     <input formControlName="bedrooms" type="number" min="1" />
                   </label>
                   <label class="counter-input">
-                    <span>Beds</span>
+                    <span>{{ language.t('beds') }}</span>
                     <input formControlName="beds" type="number" min="1" />
                   </label>
                   <label class="counter-input">
-                    <span>Baths</span>
+                    <span>{{ language.t('baths') }}</span>
                     <input formControlName="bathrooms" type="number" min="1" step="0.5" />
                   </label>
                 </div>
@@ -118,7 +119,7 @@ import { PropertyService } from '../../core/property.service';
               }
 
               <button type="submit" class="submit-btn" [disabled]="form.invalid || isSubmitting()">
-                <span>{{ isSubmitting() ? 'Publishing...' : 'Publish Listing' }}</span>
+                <span>{{ isSubmitting() ? language.t('publishing') : language.t('publishListing') }}</span>
                 <span class="material-symbols-outlined">{{ isSubmitting() ? 'hourglass_top' : 'rocket_launch' }}</span>
               </button>
             </form>
@@ -127,7 +128,7 @@ import { PropertyService } from '../../core/property.service';
 
         <aside class="my-inventory">
           <div class="inventory-header">
-            <h3>My Properties</h3>
+            <h3>{{ language.t('myProperties') }}</h3>
             <span class="count-chip">{{ properties().length }} total</span>
           </div>
 
@@ -142,7 +143,7 @@ import { PropertyService } from '../../core/property.service';
                   <h4>{{ item.title }}</h4>
                   <p>{{ item.city }}, {{ item.country }}</p>
                   <div class="card-footer">
-                    <strong>{{ item.price_per_night | currency:'XAF':'symbol':'1.0-0' }} <small>/ night</small></strong>
+                    <strong>{{ item.price_per_night | currency:'XAF':'symbol':'1.0-0' }} <small>/ {{ language.t('night') }}</small></strong>
                     <button type="button" class="icon-btn-delete" (click)="deleteProperty(item.id)" title="Remove Listing">
                       <span class="material-symbols-outlined">delete_sweep</span>
                     </button>
@@ -152,8 +153,8 @@ import { PropertyService } from '../../core/property.service';
             } @empty {
               <div class="empty-inventory">
                 <span class="material-symbols-outlined">maps_home_work</span>
-                <p>You haven't listed any properties yet.</p>
-                <small>Start by filling out the form to the left.</small>
+                <p>{{ language.t('noPropertiesListed') }}</p>
+                <small>{{ language.t('startByFillingForm') }}</small>
               </div>
             }
           </div>
@@ -598,6 +599,7 @@ import { PropertyService } from '../../core/property.service';
 export class HostPage {
   private readonly fb = inject(FormBuilder);
   private readonly propertiesApi = inject(PropertyService);
+  protected readonly language = inject(LanguageService);
 
   protected readonly properties = signal<Property[]>([]);
   protected readonly notice = signal('');
@@ -656,14 +658,14 @@ export class HostPage {
           bathrooms: 1
         });
         this.load();
-        this.showNotice('Listing published successfully!');
+        this.showNotice(this.language.t('listingPublished'));
       },
       error: (err) => {
         this.isSubmitting.set(false);
         if (err.status === 403) {
-          this.error.set('You do not have permission to host. Please register as a Host.');
+          this.error.set(this.language.t('noPermissionHost'));
         } else {
-          this.error.set('Could not publish listing. Please check all fields.');
+          this.error.set(this.language.t('couldNotPublish'));
         }
       }
     });
@@ -673,7 +675,7 @@ export class HostPage {
     if (confirm('Are you sure you want to delete this listing? This will remove all associated bookings and reviews.')) {
       this.propertiesApi.delete(id).subscribe(() => {
         this.load();
-        this.showNotice('Listing removed.');
+        this.showNotice(this.language.t('listingRemoved'));
       });
     }
   }

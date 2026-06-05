@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
+import { LanguageService } from '../../core/language.service';
 
 @Component({
   selector: 'app-login-page',
@@ -51,27 +52,28 @@ import { AuthService } from '../../core/auth.service';
           <div class="auth-mark">
             <span class="material-symbols-outlined">domain</span>
           </div>
-          <h1>Welcome back</h1>
-          <p>Login to manage your trips or host your home.</p>
-        </div>
+          <h1>{{ language.t('welcomeBack') }}</h1>
+          <p>{{ language.t('loginSubtitle') }}</p>
+          </div>
 
-        <form [formGroup]="form" (ngSubmit)="submit()">
-          <label>Username<input formControlName="username" placeholder="your username" /></label>
+          <form [formGroup]="form" (ngSubmit)="submit()">
+          <label>{{ language.t('username') }}<input formControlName="username" [placeholder]="language.t('username')" /></label>
           <label>
-            <span class="label-row">Password <a href="#">Forgot password?</a></span>
-            <input formControlName="password" type="password" placeholder="Enter your password" />
+            <span class="label-row">{{ language.t('password') }} <a href="#">{{ language.t('forgotPassword') }}</a></span>
+            <input formControlName="password" type="password" [placeholder]="language.t('password')" />
           </label>
           <label class="check-row">
             <input type="checkbox" />
-            <span>Remember me</span>
+            <span>{{ language.t('rememberMe') }}</span>
           </label>
           @if (error()) {
             <p class="notice">{{ error() }}</p>
           }
-          <button type="submit" [disabled]="form.invalid || loading()">{{ loading() ? 'Signing in...' : 'Log In' }}</button>
-        </form>
+          <button type="submit" [disabled]="form.invalid || loading()">{{ loading() ? language.t('signingIn') : language.t('logIn') }}</button>
+          </form>
 
-        <div class="divider"><span>or continue with</span></div>
+          <div class="divider"><span>{{ language.t('orContinueWith') }}</span></div>
+
         <div class="social-grid">
           <button type="button" class="google-login" (click)="socialLogin('Google')">
             <span class="social-icon" aria-hidden="true">
@@ -95,7 +97,7 @@ import { AuthService } from '../../core/auth.service';
           </button>
         </div>
 
-        <p class="auth-switch">Don't have an account? <a routerLink="/register">Sign up</a></p>
+        <p class="auth-switch">{{ language.t('dontHaveAccount') }} <a routerLink="/register">{{ language.t('signUp') }}</a></p>
       </div>
     </section>
 
@@ -108,6 +110,7 @@ export class LoginPage {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  protected readonly language = inject(LanguageService);
 
   protected readonly loading = signal(false);
   protected readonly error = signal('');

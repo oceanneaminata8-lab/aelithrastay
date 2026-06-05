@@ -896,7 +896,7 @@ button.stay-card {
   color: #202124 !important;
 }
 
-..social-grid button:last-child {
+.social-grid button:last-child {
   background: #000000;
   color: #ffffff !important;
   border-color: #000000;

@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { User } from '../../core/models';
 import { UserService } from '../../core/user.service';
+import { LanguageService } from '../../core/language.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -13,8 +14,8 @@ import { UserService } from '../../core/user.service';
     <section class="page-section narrow">
       <header class="profile-header">
         <div>
-          <span class="eyebrow">Account</span>
-          <h1>Your Profile</h1>
+          <span class="eyebrow">{{ language.t('account') }}</span>
+          <h1>{{ language.t('yourProfile') }}</h1>
         </div>
         @if (auth.currentUser(); as user) {
           <button class="icon-button" type="button" (click)="toggleEdit(user)" [attr.aria-label]="editing() ? 'Close editor' : 'Edit profile'">
@@ -50,16 +51,16 @@ import { UserService } from '../../core/user.service';
           @if (!editing()) {
             <div class="profile-info">
               <div class="info-group">
-                <span class="label">Email address</span>
+                <span class="label">{{ language.t('emailAddress') }}</span>
                 <p>{{ user.email }}</p>
               </div>
               <div class="info-group">
-                <span class="label">Phone number</span>
-                <p>{{ user.phone || 'Not provided' }}</p>
+                <span class="label">{{ language.t('phoneNumber') }}</span>
+                <p>{{ user.phone || language.t('notProvided') }}</p>
               </div>
               <div class="info-group">
-                <span class="label">About</span>
-                <p>{{ user.bio || 'No bio yet. Tell guests and hosts a little about yourself.' }}</p>
+                <span class="label">{{ language.t('about') }}</span>
+                <p>{{ user.bio || language.t('noBioYet') }}</p>
               </div>
             </div>
 
@@ -70,36 +71,36 @@ import { UserService } from '../../core/user.service';
             <div class="profile-actions">
               <button class="btn-primary" type="button" (click)="startEdit(user)">
                 <span class="material-symbols-outlined">edit</span>
-                Edit Profile
+                {{ language.t('editProfile') }}
               </button>
               <button class="btn-outline" type="button" (click)="securityNotice()">
                 <span class="material-symbols-outlined">shield_lock</span>
-                Security Settings
+                {{ language.t('securitySettings') }}
               </button>
             </div>
           } @else {
             <form class="profile-form" [formGroup]="form" (ngSubmit)="save(user)">
               <div class="form-grid">
                 <label>
-                  First name
-                  <input formControlName="first_name" placeholder="First name" />
+                  {{ language.t('firstName') }}
+                  <input formControlName="first_name" [placeholder]="language.t('firstName')" />
                 </label>
                 <label>
-                  Last name
-                  <input formControlName="last_name" placeholder="Last name" />
+                  {{ language.t('lastName') }}
+                  <input formControlName="last_name" [placeholder]="language.t('lastName')" />
                 </label>
               </div>
 
               <label>
-                Username
-                <input formControlName="username" placeholder="your_username" />
+                {{ language.t('username') }}
+                <input formControlName="username" [placeholder]="language.t('username')" />
                 @if (form.controls.username.invalid && form.controls.username.touched) {
-                  <small class="field-error">Use letters, numbers, @, ., +, -, or _.</small>
+                  <small class="field-error">{{ language.t('usernameHint') }}</small>
                 }
               </label>
 
               <label>
-                Email address
+                {{ language.t('emailAddress') }}
                 <input formControlName="email" type="email" placeholder="name@example.com" />
                 @if (form.controls.email.invalid && form.controls.email.touched) {
                   <small class="field-error">Enter a valid email address.</small>
@@ -108,11 +109,11 @@ import { UserService } from '../../core/user.service';
 
               <div class="form-grid">
                 <label>
-                  Phone number
+                  {{ language.t('phoneNumber') }}
                   <input formControlName="phone" type="tel" placeholder="+1 555 0100" />
                 </label>
                 <label>
-                  Account type
+                  {{ language.t('accountType') }}
                   <select formControlName="role">
                     <option value="guest">Guest</option>
                     <option value="host">Host</option>
@@ -124,7 +125,7 @@ import { UserService } from '../../core/user.service';
               </div>
 
               <label>
-                Bio
+                {{ language.t('bio') }}
                 <textarea formControlName="bio" rows="5" maxlength="600" placeholder="Share your travel style, hosting experience, or anything useful for bookings."></textarea>
                 <small class="field-hint">{{ bioCount() }}/600 characters</small>
               </label>
@@ -143,10 +144,10 @@ import { UserService } from '../../core/user.service';
               <div class="profile-actions">
                 <button class="btn-primary" type="submit" [disabled]="form.invalid || saving()">
                   <span class="material-symbols-outlined">save</span>
-                  {{ saving() ? 'Saving...' : 'Save Changes' }}
+                  {{ saving() ? language.t('saving') : language.t('save') }}
                 </button>
                 <button class="btn-outline" type="button" (click)="cancelEdit(user)" [disabled]="saving()">
-                  Cancel
+                  {{ language.t('close') }}
                 </button>
               </div>
             </form>
@@ -155,9 +156,9 @@ import { UserService } from '../../core/user.service';
       } @else {
         <div class="empty-state">
           <span class="material-symbols-outlined">login</span>
-          <h3>Please login</h3>
-          <p>You need to be logged in to view and manage your profile settings.</p>
-          <a routerLink="/login" class="btn-primary">Login now</a>
+          <h3>{{ language.t('pleaseLogin') }}</h3>
+          <p>{{ language.t('loginToViewProfile') }}</p>
+          <a routerLink="/login" class="btn-primary">{{ language.t('loginNow') }}</a>
         </div>
       }
     </section>
@@ -232,6 +233,7 @@ import { UserService } from '../../core/user.service';
 })
 export class ProfilePage {
   protected readonly auth = inject(AuthService);
+  protected readonly language = inject(LanguageService);
   private readonly fb = inject(FormBuilder);
   private readonly users = inject(UserService);
 
@@ -321,7 +323,7 @@ export class ProfilePage {
         this.avatarPreview.set('');
         this.selectedAvatarName.set('');
         this.messageType.set('success');
-        this.message.set('Profile updated successfully.');
+        this.message.set(this.language.t('profileUpdated'));
       },
       error: (error: HttpErrorResponse) => {
         this.saving.set(false);
@@ -333,7 +335,7 @@ export class ProfilePage {
 
   securityNotice(): void {
     this.messageType.set('error');
-    this.message.set('Password and security settings are not available yet.');
+    this.message.set(this.language.t('securitySettingsNotAvailable'));
   }
 
   displayName(user: User): string {

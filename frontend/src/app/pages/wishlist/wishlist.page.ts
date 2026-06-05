@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { WishlistItem } from '../../core/models';
 import { WishlistService } from '../../core/wishlist.service';
+import { LanguageService } from '../../core/language.service';
 
 @Component({
   selector: 'app-wishlist-page',
@@ -10,8 +11,8 @@ import { WishlistService } from '../../core/wishlist.service';
   template: `
     <section class="page-section">
       <header class="section-header">
-        <span class="eyebrow">Saved</span>
-        <h1>Your wishlist</h1>
+        <span class="eyebrow">{{ language.t('saved') }}</span>
+        <h1>{{ language.t('yourWishlist') }}</h1>
       </header>
 
       <div class="stay-grid">
@@ -36,23 +37,23 @@ import { WishlistService } from '../../core/wishlist.service';
                 <h3>{{ item.property_detail.title }}</h3>
                 <div class="rating">
                   <span class="material-symbols-outlined">star</span>
-                  <span>{{ item.property_detail.average_rating || 'New' }}</span>
+                  <span>{{ item.property_detail.average_rating || language.t('new') }}</span>
                 </div>
               </div>
               <p class="location">{{ item.property_detail.city }}, {{ item.property_detail.country }}</p>
               <div class="price-row">
                 <span class="price">{{ item.property_detail.price_per_night | currency:'XAF':'symbol':'1.0-0' }}</span>
-                <span class="unit">/ night</span>
+                <span class="unit">/ {{ language.t('night') }}</span>
               </div>
-              <button type="button" class="btn-remove" (click)="remove(item.id)">Remove from wishlist</button>
+              <button type="button" class="btn-remove" (click)="remove(item.id)">{{ language.t('removeFromWishlist') }}</button>
             </div>
           </article>
         } @empty {
           <div class="empty-state">
             <span class="material-symbols-outlined">favorite_border</span>
-            <h3>No saved stays yet</h3>
-            <p>Click the heart icon on any property to save it here for later.</p>
-            <a routerLink="/" class="btn-primary">Explore properties</a>
+            <h3>{{ language.t('noSavedStays') }}</h3>
+            <p>{{ language.t('clickHeartToSave') }}</p>
+            <a routerLink="/" class="btn-primary">{{ language.t('exploreProperties') }}</a>
           </div>
         }
       </div>
@@ -102,6 +103,7 @@ import { WishlistService } from '../../core/wishlist.service';
 })
 export class WishlistPage {
   private readonly wishlistApi = inject(WishlistService);
+  protected readonly language = inject(LanguageService);
   protected readonly items = signal<WishlistItem[]>([]);
 
   private readonly fallbackImages = [
