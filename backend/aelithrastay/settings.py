@@ -15,6 +15,8 @@ import dj_database_url
 from datetime import timedelta  # <-- Fixed: Added missing timedelta import
 from pathlib import Path
 
+FRONTEND_URL = os.environ.get("ANGULAR_APP_URL", "http://localhost:4200")
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -32,6 +34,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    "corsheaders",
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -52,6 +55,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # Cleaned up duplicate
@@ -162,3 +166,6 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
+CSRF_TRUSTED_ORIGINS = [
+    FRONTEND_URL,
+]
