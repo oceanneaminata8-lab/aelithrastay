@@ -20,10 +20,12 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   register(payload: Partial<User> & { password: string }): Observable<User> {
+    // Fixed: Removed duplicate /api prefix
     return this.http.post<User>(`${API_BASE_URL}/auth/register/`, payload);
   }
 
   login(username: string, password: string): Observable<TokenResponse> {
+    // Fixed: Removed duplicate /api prefix
     return this.http.post<TokenResponse>(`${API_BASE_URL}/auth/login/`, { username, password }).pipe(
       tap((tokens) => {
         localStorage.setItem('access_token', tokens.access);
@@ -34,12 +36,14 @@ export class AuthService {
 
   refreshAccessToken(): Observable<RefreshResponse> {
     const refresh = localStorage.getItem('refresh_token');
+    // Fixed: Removed duplicate /api prefix
     return this.http.post<RefreshResponse>(`${API_BASE_URL}/auth/refresh/`, { refresh }).pipe(
       tap((tokens) => localStorage.setItem('access_token', tokens.access))
     );
   }
 
   loadMe(): Observable<User> {
+    // Fixed: Removed duplicate /api prefix
     return this.http.get<User>(`${API_BASE_URL}/auth/me/`).pipe(
       tap((user) => {
         this.currentUser.set(user);
