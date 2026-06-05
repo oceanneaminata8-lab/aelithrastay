@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 import os
 import dj_database_url
-from datetime import timedelta  # <-- Fixed: Added missing timedelta import
+from datetime import timedelta
 from pathlib import Path
 
 FRONTEND_URL = os.environ.get("ANGULAR_APP_URL", "http://localhost:4200")
@@ -34,15 +34,14 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    "corsheaders",
-    'jazzmin',
+    'jazzmin',             # Kept exactly as you requested!
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',  # Cleaned up duplicate
+    'corsheaders',         # Cleaned up duplicate here
     'rest_framework',
     'rest_framework_simplejwt',
     'accounts',
@@ -55,10 +54,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
+    "corsheaders.middleware.CorsMiddleware", # Placed at the top safely once
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # Cleaned up duplicate
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -88,7 +86,6 @@ WSGI_APPLICATION = 'aelithrastay.wsgi.application'
 
 
 # Database
-# Cleaned up duplicate: prioritize DATABASE_URL if available, else fallback to local sqlite3
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3'),
