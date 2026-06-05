@@ -34,7 +34,7 @@ interface LandingCategory {
     <header class="stay-hero">
       <div class="stay-hero-media">
         <!-- Relaxed optimized developer layout image links -->
-        <img src="https://picsum.photos/id/1015/1600/900" alt="Modern villa with pool at sunset" />
+        <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1600&q=80" alt="Modern luxury villa with infinity pool at sunset" />
       </div>
       <div class="stay-hero-content">
         <h1>{{ language.t('findNextStay') }} <span class="highlight">{{ language.t('unforgettable') }}</span></h1>
@@ -147,7 +147,7 @@ interface LandingCategory {
       <!-- Fixed: Modified to standard inline image handling to circumvent CSS Background CORS blocking -->
       <section class="feature-banner" aria-label="Stay of the week">
         <div class="banner-image-bg">
-          <img src="https://picsum.photos/id/1029/1200/600" alt="Highland Castle Background" />
+          <img src="https://images.unsplash.com/photo-1508849789987-4e5333c12b78?auto=format&fit=crop&w=1200&q=80" alt="Highland Castle Background" />
         </div>
         <div class="banner-content">
           <span class="tag">{{ language.t('stayOfWeek') }}</span>
@@ -168,7 +168,7 @@ interface LandingCategory {
         </div>
         <div class="invitation-visual">
           <div class="image-wrapper">
-            <img src="https://picsum.photos/id/1060/800/600" alt="Hosts preparing a welcoming kitchen" />
+            <img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80" alt="Hosts preparing a welcoming kitchen" />
             <div class="testimonial-card">
               <span class="quote">"</span>
               <p>{{ language.t('hostingChangedLife') }}</p>
@@ -842,13 +842,13 @@ export class HomePage {
     ordering: ['']
   });
 
-  // Safe developer static sample array
+  // Updated: High-quality curated premium photography array for real-estate fallbacks
   private readonly fallbackImages = [
-    'https://picsum.photos/id/1029/900/600',
-    'https://picsum.photos/id/1040/900/600',
-    'https://picsum.photos/id/1043/900/600',
-    'https://picsum.photos/id/1069/900/600',
-    'https://picsum.photos/id/122/900/600'
+    'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=80', // Apartment
+    'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=900&q=80', // House
+    'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80', // Villa
+    'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=900&q=80', // Cabin
+    'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=900&q=80'  // Room
   ];
 
   constructor() {
