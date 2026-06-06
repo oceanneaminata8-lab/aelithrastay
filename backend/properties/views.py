@@ -1,3 +1,5 @@
+from django.db import models  # Imported for Q objects handling complex logic
+from django.db.models import Q
 from rest_framework import permissions, viewsets
 
 from aelithrastay.permissions import IsHostOrReadOnly, IsPropertyHostOrReadOnly
@@ -67,9 +69,16 @@ class PropertyImageViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = PropertyImage.objects.select_related('property', 'property__host')
+        
+        # 1. Staff and Admins can view absolutely all system media files
         if user.is_staff or user.role == 'admin':
             return queryset
-        return queryset.filter(property__host=user)
+            
+        # 2. General users view images if they own the layout OR if the property is verified & public
+        return queryset.filter(
+            Q(property__host=user) | 
+            Q(property__is_active=True, property__approval_status=Property.ApprovalStatus.APPROVED)
+        ).distinct()
 
     def perform_create(self, serializer):
         property_obj = serializer.validated_data['property']
