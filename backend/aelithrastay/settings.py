@@ -137,10 +137,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # This tells Django to use WhiteNoise to compress and cache your admin styles
 STORAGES = {
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
-WHITENOISE_MANIFEST_STRICT = False
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
