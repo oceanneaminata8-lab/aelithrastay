@@ -34,7 +34,7 @@ interface LandingCategory {
     <header class="stay-hero">
       <div class="stay-hero-media">
         <!-- Relaxed optimized developer layout image links -->
-        <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1600&q=80" alt="Modern luxury villa with infinity pool at sunset" />
+        <img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=1600&q=80" alt="African savanna luxury resort at sunset" />
       </div>
       <div class="stay-hero-content">
         <h1>{{ language.t('findNextStay') }} <span class="highlight">{{ language.t('unforgettable') }}</span></h1>
@@ -48,7 +48,12 @@ interface LandingCategory {
             </label>
             <label>
               <span>{{ language.t('country') }}</span>
-              <input formControlName="country" [placeholder]="language.t('addCountry')" />
+              <select formControlName="country">
+                <option value="">{{ language.t('allCountries') }}</option>
+                @for (country of africanCountries; track country) {
+                  <option [value]="country">{{ language.t(country.toLowerCase().replace(' ', '')) }}</option>
+                }
+              </select>
             </label>
             <label>
               <span>{{ language.t('guests') }}</span>
@@ -147,12 +152,12 @@ interface LandingCategory {
       <!-- Fixed: Modified to standard inline image handling to circumvent CSS Background CORS blocking -->
       <section class="feature-banner" aria-label="Stay of the week">
         <div class="banner-image-bg">
-          <img src="https://images.unsplash.com/photo-1508849789987-4e5333c12b78?auto=format&fit=crop&w=1200&q=80" alt="Highland Castle Background" />
+          <img src="https://images.unsplash.com/photo-1493246507139-91e8bef99c17?auto=format&fit=crop&w=1200&q=80" alt="Serengeti Safari Lodge Background" />
         </div>
         <div class="banner-content">
           <span class="tag">{{ language.t('stayOfWeek') }}</span>
-          <h2>Highland Heritage Castle</h2>
-          <p>Experience a night of royalty in a restored stronghold where luxury meets history in every stone. A truly unique escape for those seeking something extraordinary.</p>
+          <h2>Serengeti Luxury Lodge</h2>
+          <p>Experience the heart of the wild in a world-class safari lodge where luxury meets the untamed beauty of the African savanna. A truly unique escape for those seeking something extraordinary.</p>
           <button type="button" (click)="exploreCastle()">
             {{ language.t('viewDetails') }} 
             <span class="material-symbols-outlined">arrow_forward</span>
@@ -822,15 +827,20 @@ export class HomePage {
   });
   protected readonly visibleProperties = computed(() => this.properties());
 
+  protected readonly africanCountries = [
+    'Cameroon', 'Senegal', 'Ivory Coast', 'Nigeria', 'South Africa', 
+    'Kenya', 'Morocco', 'Egypt', 'Ghana', 'Tanzania'
+  ];
+
   protected readonly categories: LandingCategory[] = [
     { label: 'Amazing pools', translationKey: 'amazingPools', icon: 'pool', filters: {} },
-    { label: 'Beachfront', translationKey: 'beachfront', icon: 'beach_access', filters: { country: 'Greece' } },
+    { label: 'Beachfront', translationKey: 'beachfront', icon: 'beach_access', filters: { country: 'Senegal' } },
     { label: 'Cabins', translationKey: 'cabins', icon: 'cabin', filters: { property_type: 'cabin' } },
     { label: 'Luxe', translationKey: 'luxe', icon: 'diamond', filters: { min_price: '300' } },
     { label: 'Trending', translationKey: 'trending', icon: 'trending_up', filters: { ordering: '-created_at' } },
-    { label: 'Countryside', translationKey: 'countryside', icon: 'landscape', filters: { property_type: 'house' } },
+    { label: 'Countryside', translationKey: 'countryside', icon: 'landscape', filters: { country: 'Cameroon' } },
     { label: 'Castles', translationKey: 'castles', icon: 'castle', filters: { property_type: 'villa' } },
-    { label: 'Top cities', translationKey: 'topCities', icon: 'apartment', filters: { property_type: 'apartment' } }
+    { label: 'Top cities', translationKey: 'topCities', icon: 'apartment', filters: { country: 'South Africa' } }
   ];
 
   protected readonly filters = this.fb.nonNullable.group({

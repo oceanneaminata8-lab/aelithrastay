@@ -8,9 +8,9 @@ def create_superuser(apps, schema_editor):
     # Change 'admin' and 'Password123!' to your preferred live login details!
     if not User.objects.filter(username='admin').exists():
         User.objects.create_superuser(
-            username='admin',
-            email='admin@aelithrastay.com',
-            password='Password123!'
+            username='maimuna_admin',
+            email='maimuna@aelithrastay.com',
+            password='StaySecure2026!'
         )
 
 class Migration(migrations.Migration):
