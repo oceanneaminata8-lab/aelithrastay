@@ -72,7 +72,8 @@ class Property(models.Model):
 
 class PropertyImage(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='properties/')
+    # Change from ImageField to URLField to handle cloud links easily
+    image = models.URLField(max_length=500, help_text="Paste a direct image web URL here")
     caption = models.CharField(max_length=160, blank=True)
     is_cover = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
