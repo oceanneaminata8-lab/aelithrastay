@@ -27,8 +27,17 @@ class PropertyViewSet(viewsets.ModelViewSet):
             'reviews',
         )
         user = self.request.user
+        mine = self.request.query_params.get('mine')
+
+        # Visibility logic
         if not (user.is_authenticated and (user.is_staff or user.role == 'admin')):
-            queryset = queryset.filter(is_active=True, approval_status=Property.ApprovalStatus.APPROVED)
+            # Public users and normal guests/hosts only see approved/active properties
+            # UNLESS they are viewing their own properties
+            public_filter = Q(is_active=True, approval_status=Property.ApprovalStatus.APPROVED)
+            if user.is_authenticated:
+                queryset = queryset.filter(public_filter | Q(host=user))
+            else:
+                queryset = queryset.filter(public_filter)
 
         city = self.request.query_params.get('city')
         country = self.request.query_params.get('country')
@@ -36,7 +45,6 @@ class PropertyViewSet(viewsets.ModelViewSet):
         guests = self.request.query_params.get('guests')
         min_price = self.request.query_params.get('min_price')
         max_price = self.request.query_params.get('max_price')
-        mine = self.request.query_params.get('mine')
 
         if city:
             queryset = queryset.filter(city__icontains=city)

@@ -7,6 +7,8 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    properties_count = serializers.IntegerField(source='properties.count', read_only=True)
+
     class Meta:
         model = User
         fields = (
@@ -20,8 +22,9 @@ class UserSerializer(serializers.ModelSerializer):
             'avatar',
             'bio',
             'is_suspended',
+            'properties_count',
         )
-        read_only_fields = ('id',)
+        read_only_fields = ('id', 'properties_count')
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -68,6 +71,8 @@ class EmailOrUsernameTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class AdminUserSerializer(serializers.ModelSerializer):
     """Detailed user info for admin panel"""
+    properties_count = serializers.IntegerField(source='properties.count', read_only=True)
+
     class Meta:
         model = User
         fields = (
@@ -83,8 +88,9 @@ class AdminUserSerializer(serializers.ModelSerializer):
             'is_suspended',
             'is_staff',
             'date_joined',
+            'properties_count',
         )
-        read_only_fields = ('id', 'date_joined')
+        read_only_fields = ('id', 'date_joined', 'properties_count')
 
 
 class AdminLogSerializer(serializers.ModelSerializer):

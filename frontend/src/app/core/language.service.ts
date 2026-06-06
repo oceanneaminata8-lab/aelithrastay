@@ -254,7 +254,8 @@ const TRANSLATIONS: TranslationMap = {
     listingPublished: 'Listing published successfully!',
     noPermissionHost: 'You do not have permission to host. Please register as a Host.',
     couldNotPublish: 'Could not publish listing. Please check all fields.',
-    listingRemoved: 'Listing removed.'
+    listingRemoved: 'Listing removed.',
+    hostedProperties: 'Hosted Properties'
   },
   fr: {
     explore: 'Explorer',
@@ -503,7 +504,8 @@ const TRANSLATIONS: TranslationMap = {
     listingPublished: 'Annonce publiée avec succès !',
     noPermissionHost: 'Vous n’avez pas la permission d’héberger. Veuillez vous inscrire comme hôte.',
     couldNotPublish: 'Impossible de publier l’annonce. Veuillez vérifier tous les champs.',
-    listingRemoved: 'Annonce retirée.'
+    listingRemoved: 'Annonce retirée.',
+    hostedProperties: 'Propriétés hébergées'
   }
 };
 
