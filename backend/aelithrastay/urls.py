@@ -36,6 +36,12 @@ from reviews.views import ReviewViewSet
 from reviews.admin_views import AdminReviewModerationViewSet
 from wishlist.views import WishlistViewSet
 
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # ... any other paths you have like path('api/', include(...)) ...
+]
+
+# 2. ONLY append the static helper AFTER urlpatterns has been created above
 if settings.MEDIA_URL:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
