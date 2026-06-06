@@ -36,6 +36,9 @@ from reviews.views import ReviewViewSet
 from reviews.admin_views import AdminReviewModerationViewSet
 from wishlist.views import WishlistViewSet
 
+if settings.MEDIA_URL:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 # Simple view function to handle the empty/root path
 def api_root(request):
     return JsonResponse({
